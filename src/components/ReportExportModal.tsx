@@ -42,7 +42,7 @@ export const ReportExportModal: React.FC<ReportExportModalProps> = ({
 
   const handleDownloadJson = () => {
     const reportData = {
-      title: "ETHIODROUGHT Exploratory Environmental Report",
+      title: "Aether Exploratory Environmental Report",
       project: "NASA Space Apps Challenge 2026 - Be An Earth System Trend Detective",
       timestamp: new Date().toISOString(),
       geographicTarget: regionName,
@@ -90,7 +90,7 @@ export const ReportExportModal: React.FC<ReportExportModalProps> = ({
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `ETHIODROUGHT_Report_${regionName.replace(/\s+/g, "_")}_${observationDate}.json`;
+    a.download = `Aether_Report_${regionName.replace(/\s+/g, "_")}_${observationDate}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -120,7 +120,7 @@ export const ReportExportModal: React.FC<ReportExportModalProps> = ({
           <div className="flex justify-between items-start border-b border-white/10 pb-3">
             <div>
               <span className="text-[10px] tracking-widest text-accent-light uppercase">
-                ETHIODROUGHT — BEYOND RAINFALL
+                AETHER — BEYOND RAINFALL
               </span>
               <h1 className="text-lg font-bold text-text-primary mt-0.5">
                 Exploratory Environmental & Drought Analysis

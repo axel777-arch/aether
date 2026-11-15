@@ -23,10 +23,10 @@ export const ETHIOPIA_HOTSPOTS: Hotspot[] = [
     nameAm: "ቦረና",
     lat: 4.8,
     lon: 38.3,
-    anomaly: "-1.82 σ",
-    soil: "0.142 m³/m³ (-2.14 σ)",
-    veg: "0.375 (-1.65 σ)",
-    status: "SEVERE",
+    anomaly: "Not available",
+    soil: "Not available",
+    veg: "Not available",
+    status: "NO VERIFIED DATA",
     focus: "Pastoral rangelands & Tula deep wells",
   },
   {
@@ -35,10 +35,10 @@ export const ETHIOPIA_HOTSPOTS: Hotspot[] = [
     nameAm: "ፋፈን",
     lat: 9.3,
     lon: 42.8,
-    anomaly: "-1.45 σ",
-    soil: "0.155 m³/m³ (-1.80 σ)",
-    veg: "0.290 (-1.35 σ)",
-    status: "HIGH",
+    anomaly: "Not available",
+    soil: "Not available",
+    veg: "Not available",
+    status: "NO VERIFIED DATA",
     focus: "Lowland pastoral & riverine recharge",
   },
   {
@@ -47,10 +47,10 @@ export const ETHIOPIA_HOTSPOTS: Hotspot[] = [
     nameAm: "ሰሜን አፋር",
     lat: 11.8,
     lon: 41.0,
-    anomaly: "-1.95 σ",
-    soil: "0.118 m³/m³ (-2.40 σ)",
-    veg: "0.210 (-1.90 σ)",
-    status: "CRITICAL",
+    anomaly: "Not available",
+    soil: "Not available",
+    veg: "Not available",
+    status: "NO VERIFIED DATA",
     focus: "Hyper-arid scrubland & livestock hydration",
   },
   {
@@ -59,10 +59,10 @@ export const ETHIOPIA_HOTSPOTS: Hotspot[] = [
     nameAm: "ትግራይ",
     lat: 13.8,
     lon: 39.0,
-    anomaly: "-0.92 σ",
-    soil: "0.210 m³/m³ (-0.85 σ)",
-    veg: "0.480 (-0.60 σ)",
-    status: "MODERATE",
+    anomaly: "Not available",
+    soil: "Not available",
+    veg: "Not available",
+    status: "NO VERIFIED DATA",
     focus: "Highland terraced agriculture & Kiremt rains",
   },
 ];
@@ -354,11 +354,11 @@ export const EthiopiaDottedGlobe: React.FC<DottedGlobeProps> = ({
 
     // Animation Loop
     let animationFrameId: number;
-    let clock = new THREE.Clock();
+    const startTime = performance.now();
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
-      const elapsedTime = clock.getElapsedTime();
+      const elapsedTime = (performance.now() - startTime) / 1000;
 
       // Slow Idle Auto-rotation when not dragging
       if (!isDraggingRef.current && globeGroupRef.current) {

@@ -37,7 +37,7 @@ export default function SolutionPage() {
       data: "NASA GPM IMERG · FLDAS Noah 0-100cm · MODIS Terra NDVI",
       produces: isAmharic
         ? "በዞንና በወረዳ የተከፋፈለ በይነተገናኝ የቀለም ደረጃ ካርታ ከወቅታዊ የመረጃ ንብርብሮች ጋር"
-        : "Interactive geospatial raster & choropleth map classifying drought severity with synchronized timeline playback across 800+ woredas.",
+        : "Planned interactive boundary and observation maps. The current prototype displays administrative boundaries only.",
       useful: isAmharic
         ? "አስቸኳይ የመኖ ድጋፍና የውሃ አቅርቦት የሚያስፈልጋቸውን አካባቢዎች ወዲያውኑ ለመለየት ያስችላል"
         : "Enables rapid spatial identification of priority relief areas, routing emergency water trucking and fodder distribution efficiently.",
@@ -66,13 +66,13 @@ export default function SolutionPage() {
       problem: isAmharic
         ? "ድርቁ በጊዜ ሂደት እየተባባሰ ነው ወይስ የአንድ ወቅት ተፈጥሯዊ መዋዠቅ ነው? ለዚህ ጥያቄ ስታትስቲካዊ ማረጋገጫ ያስፈልጋል።"
         : "Is drought frequency and intensity accelerating over decades, or is this merely interannual noise? Detecting long-term drying requires non-parametric statistical rigor.",
-      data: "24-Year Continuous NASA Satellite Archive (2000–2024)",
+      data: "Candidate time series; product availability and coverage must be verified before analysis.",
       produces: isAmharic
         ? "የ Mann-Kendall ስታትስቲክስ (S፣ Z፣ p-እሴት) እና የ Sen's slope የለውጥ ፍጥነት"
         : "Mann-Kendall monotonic trend tests (S, Z, p-value) and Sen's slope rate-of-change regressions immune to seasonal outliers.",
       useful: isAmharic
         ? "በአየር ንብረት ለውጥ ምክንያት እየደረቁ ያሉ ዞኖችን በማስረጃ አስደግፎ ለመለየት ያስችላል"
-        : "Quantifies decadal drying trends (e.g. Borena NDVI decline of -0.0142/decade, p < 0.001) for evidence-based climate adaptation policy.",
+        : "Would quantify trends after validated, sufficiently long environmental time series are connected.",
     },
     {
       id: "04",
@@ -101,7 +101,7 @@ export default function SolutionPage() {
       data: "Compound multi-sensor severity composite + Population vulnerability metrics",
       produces: isAmharic
         ? "በ 4 ደረጃዎች የተከፋፈለ (መካከለኛ፣ ከፍተኛ፣ ከባድ፣ ወሳኝ) የዞኖች ደረጃ እና የቀጥታ ማስጠንቀቂያ"
-        : "Ranked zonal vulnerability priority queue categorized into Moderate, High, Severe, and Critical crisis tiers with simulated SMS broadcast.",
+        : "Planned investigation-priority workflow with sample notification simulation; not a live alert service.",
       useful: isAmharic
         ? "የሰብዓዊ እርዳታ ሰጪዎች አደጋው ወደከፋበት ቦታ ፈጥነው እንዲደርሱ ይመራል"
         : "Guides field survey teams and emergency humanitarian logistics directly to zones in compound breakdown before mortality peaks.",
@@ -151,6 +151,12 @@ export default function SolutionPage() {
       </div>
 
       <div className="relative z-10 max-w-[1440px] mx-auto px-6 lg:px-12 pt-12 space-y-20">
+        <div role="note" className="rounded-xl border border-amber-500/40 bg-amber-950/30 p-4 text-sm text-amber-100">
+          {isAmharic
+            ? "የታቀዱ ባህሪያት፡ የአሁኑ ቅድመ-ሙከራ የዞን ድንበሮችንና የውሂብ ምንጭ መረጃን ያሳያል፤ የቀጥታ GPM/FLDAS/MODIS ጊዜ ተከታታይ ወይም የቀጥታ ማስጠንቀቂያ አልተገናኘም።"
+            : "Planned capabilities: the current prototype shows zone boundaries and data provenance; it has no live GPM/FLDAS/MODIS time series or real-time alert feed."}
+        </div>
+
         {/* ========================================================
             HERO: OUR SOLUTION
             ======================================================== */}
@@ -165,12 +171,12 @@ export default function SolutionPage() {
           <h1 className="font-heading text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-[#FBFCFD] leading-[1.1]">
             {isAmharic ? (
               <>
-                ETHIODROUGHT፡ <br />
+                AETHER፡ <br />
                 <span className="text-accent-cyan">የተቀናጀ የድርቅ መረጃ ማዕከል</span>
               </>
             ) : (
               <>
-                ETHIODROUGHT: <br />
+                AETHER: <br />
                 <span className="text-accent-cyan">Regional Drought Intelligence Platform</span>
               </>
             )}
@@ -178,7 +184,7 @@ export default function SolutionPage() {
 
           <p className="text-base sm:text-lg text-[#A8BFDC] max-w-2xl mx-auto leading-relaxed font-sans">
             {isAmharic
-              ? "ETHIODROUGHT የ 3 የናሳ ሳተላይት መረጃዎችን በማጣመር የኢትዮጵያን ድርቅ አደጋ በከፍተኛ ትክክለኛነት የሚከታተል፣ የሚተነትንና ቅድመ ማስጠንቀቂያ የሚሰጥ ሳይንሳዊ ስርዓት ነው።"
+              ? "AETHER የ 3 የናሳ ሳተላይት መረጃዎችን በማጣመር የኢትዮጵያን ድርቅ አደጋ በከፍተኛ ትክክለኛነት የሚከታተል፣ የሚተነትንና ቅድመ ማስጠንቀቂያ የሚሰጥ ሳይንሳዊ ስርዓት ነው።"
               : "A specialized Earth observation intelligence system fusing 3 NASA satellite data streams into a unified operational platform for detecting, diagnosing, and monitoring compound environmental drought stress across Ethiopia."}
           </p>
         </section>
@@ -280,14 +286,14 @@ export default function SolutionPage() {
           <div className="flex items-center justify-between pb-4 border-b border-[rgba(168,191,220,0.12)]">
             <div className="space-y-1">
               <span className="text-xs font-mono text-accent-cyan uppercase tracking-widest">
-                {isAmharic ? "የመረጃ ምንጮች" : "PRIMARY SATELLITE CONSTELLATIONS"}
+                {isAmharic ? "ሊጠቀሙ የሚችሉ የውሂብ ምንጮች" : "CANDIDATE DATA SOURCES"}
               </span>
               <h2 className="font-heading text-2xl lg:text-3xl font-bold text-[#FBFCFD]">
-                {isAmharic ? "በናሳ የምድር ሳይንስ ሳተላይቶች የተደገፈ" : "Powered by NASA Earth Science Missions"}
+                {isAmharic ? "የናሳ የምድር ሳይንስ ምንጮች እቅድ" : "Designed for NASA Earth Science data"}
               </h2>
             </div>
             <span className="px-3 py-1 rounded-full bg-accent-blue/20 border border-accent-blue/30 text-xs font-mono text-accent-light">
-              Verified Telemetry
+              No live telemetry configured
             </span>
           </div>
 

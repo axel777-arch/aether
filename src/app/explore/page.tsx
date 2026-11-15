@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import { useApp } from "@/context/AppContext";
 import type { MapLayerType } from "@/components/LeafletMapInner";
-import { CloudRain, Fingerprint, Layers, MapPin, Sprout } from "lucide-react";
+import overlay from "@/data/ethiopiaZoneDatasetOverlay.json";
+import { CloudRain, Map as MapIcon, MapPin, Thermometer } from "lucide-react";
 
 const DynamicMap = dynamic(
   () => import("@/components/LeafletMapInner").then((mod) => ({ default: mod.LeafletMapInner })),
@@ -19,39 +20,42 @@ const layers: {
   limitation: string;
 }[] = [
   {
-    id: "fingerprint",
-    label: "Combined evidence",
-    icon: <Fingerprint className="w-4 h-4" />,
-    source: "Rainfall, soil moisture, and vegetation",
-    limitation: "No co-located, quality-screened observations or matched seasonal baselines are configured.",
+    id: "normal",
+    label: "Normal",
+    icon: <MapIcon className="w-4 h-4" />,
+    source: "Supplied Ethiopia 72-zone GeoJSON",
+    limitation: "Shows administrative boundaries with fixed parent-region outline colors and no environmental shading.",
+  },
+  {
+    id: "temperature",
+    label: "Temperature",
+    icon: <Thermometer className="w-4 h-4" />,
+    source: overlay.datasets.surfaceTemperature.source,
+    limitation: `${overlay.datasets.surfaceTemperature.zonesWithData}/72 zones have static grid-point means (${overlay.datasets.surfaceTemperature.temporalCoverage}); daytime surface temperature is not air temperature or a current reading.`,
   },
   {
     id: "rainfall",
     label: "Rainfall",
     icon: <CloudRain className="w-4 h-4" />,
-    source: "GPM IMERG / CHIRPS v3 candidates",
-    limitation: "Neither source is ingested. Observation period, retrieval date, and local anomaly are unavailable.",
-  },
-  {
-    id: "soilMoisture",
-    label: "Soil moisture",
-    icon: <Layers className="w-4 h-4" />,
-    source: "FLDAS / SMAP candidates",
-    limitation: "Neither source is ingested or harmonized. No soil-moisture percentile can be reported.",
-  },
-  {
-    id: "vegetation",
-    label: "Vegetation",
-    icon: <Sprout className="w-4 h-4" />,
-    source: "MODIS MOD13A2 candidate",
-    limitation: "Not ingested. Quality screening, observation dates, and a seasonal baseline are unavailable.",
+    source: overlay.datasets.rainfall.source,
+    limitation: `Latest observation: ${overlay.datasets.rainfall.latestObservation.date}. The source is one Ethiopia-wide value with unstated units, so every zone receives the same fill; this is not zonal rainfall.`,
   },
 ];
 
 export default function ExplorePage() {
   const { lang, selectedRegionId, setSelectedRegionId } = useApp();
-  const [selectedMapLayer, setSelectedMapLayer] = useState<MapLayerType>("fingerprint");
+  const [selectedMapLayer, setSelectedMapLayer] = useState<MapLayerType>("normal");
   const selectedLayer = layers.find((layer) => layer.id === selectedMapLayer) ?? layers[0];
+  const observationPeriod = selectedMapLayer === "temperature"
+    ? overlay.datasets.surfaceTemperature.temporalCoverage
+    : selectedMapLayer === "rainfall"
+      ? `${overlay.datasets.rainfall.temporalCoverage.start} to ${overlay.datasets.rainfall.temporalCoverage.end}`
+      : "Not applicable";
+  const spatialResolution = selectedMapLayer === "temperature"
+    ? overlay.datasets.surfaceTemperature.spatialResolution
+    : selectedMapLayer === "rainfall"
+      ? "Ethiopia-wide average; not zone-resolved"
+      : "Administrative zones";
   const regionName = selectedRegionId === "borena"
     ? "Borena Zone (Oromia)"
     : selectedRegionId === "somali"
@@ -67,6 +71,7 @@ export default function ExplorePage() {
           <DynamicMap
             selectedRegionId={selectedRegionId}
             onSelectRegion={setSelectedRegionId}
+            selectedMapLayer={selectedMapLayer}
           />
           <div className="absolute top-3.5 left-3.5 z-[600] flex flex-wrap gap-1.5 p-1.5 rounded-2xl bg-[#162036]/95 backdrop-blur-md border border-[#41619F]/40 shadow-xl">
             {layers.map((layer) => {
@@ -84,7 +89,7 @@ export default function ExplorePage() {
                   }`}
                 >
                   {layer.icon}
-                  <span>{lang === "am" && layer.id === "fingerprint" ? "የተቀናጀ ማስረጃ" : layer.label}</span>
+                  <span>{layer.label}</span>
                 </button>
               );
             })}
@@ -94,13 +99,13 @@ export default function ExplorePage() {
         <aside className="w-full lg:w-1/4 nasa-panel-blue p-5 rounded-2xl border border-panel-border/40 space-y-5">
           <header className="border-b border-panel-border/30 pb-4">
             <div className="text-[10px] font-mono tracking-widest text-amber-300 uppercase font-bold">
-              Latest available observations
+              Historical data layers
             </div>
             <h1 className="mt-1 text-lg font-bold text-text-primary">
               {lang === "am" ? "የድርቅ ማስረጃ ምርመራ" : "Drought evidence investigation"}
             </h1>
             <p className="mt-2 text-xs text-text-secondary leading-relaxed">
-              This map is an investigation framework, not a live satellite-monitoring service.
+              Historical dataset summaries are shown where available; this is not a live monitoring service.
             </p>
           </header>
 
@@ -148,24 +153,24 @@ export default function ExplorePage() {
           <dl className="grid grid-cols-2 gap-2 text-[10px] font-mono">
             <div className="p-2 rounded-lg bg-panel-dark/60 border border-panel-border/30">
               <dt className="text-text-subtle">Observation period</dt>
-              <dd className="mt-1 text-text-primary">Unavailable</dd>
+              <dd className="mt-1 text-text-primary">{observationPeriod}</dd>
             </div>
             <div className="p-2 rounded-lg bg-panel-dark/60 border border-panel-border/30">
-              <dt className="text-text-subtle">Retrieved</dt>
-              <dd className="mt-1 text-text-primary">Unavailable</dd>
+              <dt className="text-text-subtle">Dataset status</dt>
+              <dd className="mt-1 text-text-primary">{selectedMapLayer === "normal" ? "Boundary file" : "Static summary"}</dd>
             </div>
             <div className="p-2 rounded-lg bg-panel-dark/60 border border-panel-border/30">
               <dt className="text-text-subtle">Spatial resolution</dt>
-              <dd className="mt-1 text-text-primary">Not applicable</dd>
+              <dd className="mt-1 text-text-primary">{spatialResolution}</dd>
             </div>
             <div className="p-2 rounded-lg bg-panel-dark/60 border border-panel-border/30">
               <dt className="text-text-subtle">Boundary source</dt>
-              <dd className="mt-1 text-amber-200">Illustrative</dd>
+              <dd className="mt-1 text-amber-200">Supplied GeoJSON</dd>
             </div>
           </dl>
 
           <p className="text-[10px] text-text-subtle leading-relaxed">
-            Layer selection changes the investigation topic only; it does not display measured values. Historical playback, regional comparison, and downloadable reports are unavailable until validated data are connected.
+            Temperature shading uses historical, unweighted grid-cell means where available. Rainfall shading uses the dataset's final Ethiopia-wide observation uniformly because the file contains no zone-specific values. These are value scales, not correlations; the files lack paired zone-by-time rainfall and temperature observations. Neither layer represents current conditions.
           </p>
         </aside>
       </div>

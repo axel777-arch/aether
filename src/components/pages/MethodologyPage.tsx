@@ -200,7 +200,7 @@ export const MethodologyPage: React.FC<MethodologyPageProps> = ({ lang }) => {
           <div className="p-4 rounded-2xl bg-panel-dark/80 border border-panel-border/20 space-y-1.5">
             <span className="font-bold text-text-primary block">3. Alerts Are Not Disaster Declarations</span>
             <p>
-              ETHIODROUGHT alerts are scientific monitoring notifications intended to guide research and prompt field inspection. They are not official disaster declarations and do not replace official emergency response systems (such as EDRMC).
+              Aether alerts are scientific monitoring notifications intended to guide research and prompt field inspection. They are not official disaster declarations and do not replace official emergency response systems (such as EDRMC).
             </p>
           </div>
         </div>

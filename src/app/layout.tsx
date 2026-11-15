@@ -3,7 +3,7 @@ import { ClientLayout } from "@/components/ClientLayout";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ETHIODROUGHT — Beyond Rainfall | NASA Space Apps Challenge 2026",
+  title: "Aether — Beyond Rainfall | NASA Space Apps Challenge 2026",
   description: "A drought investigation framework for Ethiopia. NASA POWER point data and a historical experimental rainfall predictor are available; zonal GPM, FLDAS, and MODIS time series are not integrated.",
   keywords: ["Ethiopia", "Borena", "Drought", "NASA Space Apps 2026", "FLDAS", "GPM IMERG", "MODIS", "Mann-Kendall", "Earth Observation"],
 };

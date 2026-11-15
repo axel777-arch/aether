@@ -490,7 +490,15 @@
         "validDateCount": 9131
       },
       "spatiallyMappableToZones": false,
-      "reason": "One Ethiopia bounding-box average is provided per date; the file has no gridded or zone-level rainfall values, and its units are not stated."
+      "reason": "One Ethiopia bounding-box average is provided per date; the file has no gridded or zone-level rainfall values, and its units are not stated.",
+      "latestObservation": {
+        "date": "2025-05-31",
+        "value": 0.828730941
+      },
+      "valueRange": {
+        "minimum": 0.000406987034,
+        "maximum": 25.638052
+      }
     }
   },
   "trainingReadiness": {

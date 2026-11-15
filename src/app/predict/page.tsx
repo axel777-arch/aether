@@ -148,7 +148,7 @@ export default function PredictorPage() {
       <header className="rounded-3xl border border-accent-secondary/35 bg-panel-dark p-6 shadow-2xl">
         <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-accent-light">
           <BrainCircuit className="h-4 w-4 text-accent-cyan" />
-          ETHIODROUGHT · EXPERIMENTAL PREDICTOR
+          AETHER · EXPERIMENTAL PREDICTOR
         </div>
         <h1 className="mt-2 text-2xl font-bold tracking-wide text-text-primary lg:text-3xl">
           One-month rainfall forecast
@@ -252,6 +252,28 @@ export default function PredictorPage() {
                   </LineChart>
                 </ResponsiveContainer>
               </div>
+              <div
+                aria-label="Predicted rainfall values"
+                className="mt-4 grid gap-3 rounded-xl border border-accent-cyan/25 bg-panel-dark/70 p-3 text-xs sm:grid-cols-3"
+              >
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-text-subtle">Predicted period</p>
+                  <p className="mt-1 font-bold text-text-primary">{data.forecast.date}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-text-subtle">Predicted mean</p>
+                  <p className="mt-1 font-bold text-accent-cyan">{formatValue(data.forecast.mean)}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-text-subtle">95% model interval</p>
+                  <p className="mt-1 font-bold text-text-primary">
+                    {formatValue(data.forecast.lower95)} – {formatValue(data.forecast.upper95)}
+                  </p>
+                </div>
+              </div>
+              <p className="mt-2 text-[10px] text-text-subtle">
+                Source-value scale; units are not stated in the input data.
+              </p>
             </article>
 
             <aside className="space-y-4 rounded-3xl border border-panel-border/30 bg-panel-dark p-5">

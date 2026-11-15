@@ -191,8 +191,8 @@ export default function HomePage() {
             </h2>
             <p className="text-sm text-[#A8BFDC] mt-1 max-w-2xl font-sans">
               {isAmharic
-                ? "የዝናብ፣ የአፈር እርጥበት እና የዕፅዋት ጤና መረጃዎች ንፅፅር በኢትዮጵያ ዞኖችና ወረዳዎች።"
-                : "Continuous triple-sensor synthesis investigating soil moisture deficits, precipitation anomalies, and vegetation health across all Ethiopian administrative zones."}
+                ? "ይህ ቅድመ-ሙከራ የዞን ድንበሮችን እና ታሪካዊ የቦታ አማካይ መረጃዎችን ያሳያል። የቀጥታ የዝናብ፣ የአፈር እርጥበት እና የዕፅዋት ጊዜ ተከታታይ መረጃ ገና አልተዋሃደም።"
+                : "This prototype shows zone boundaries and historical spatial summaries. Live rainfall, soil moisture, and vegetation time series are not yet integrated."}
             </p>
           </div>
 
@@ -225,13 +225,14 @@ export default function HomePage() {
                 </h3>
               </div>
               <span className="text-xs font-mono text-[#A8BFDC]">
-                Borena boundary · no verified observation overlay
+                72 administrative zones · geographic context only
               </span>
             </div>
             <div className="rounded-2xl overflow-hidden border border-[rgba(168,191,220,0.15)] h-[560px]">
               <DynamicMap
                 selectedRegionId={selectedRegionId}
                 onSelectRegion={(id) => setSelectedRegionId(id)}
+                selectedMapLayer="normal"
               />
             </div>
           </div>
@@ -250,9 +251,9 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="relative z-10 w-full border-t border-[rgba(168,191,220,0.1)] py-8 px-6 lg:px-12 text-center text-xs font-mono text-[#A8BFDC]/60">
-        <p>ETHIODROUGHT · BEYOND RAINFALL · NASA SPACE APPS CHALLENGE 2026</p>
+        <p>AETHER · BEYOND RAINFALL · NASA SPACE APPS CHALLENGE 2026</p>
         <p className="mt-1 text-[11px] opacity-70">
-          Powered by NASA GPM, SMAP, FLDAS & MODIS Earth Science Missions
+          Dataset registry documents data provenance, temporal coverage, and integration status
         </p>
       </footer>
     </div>

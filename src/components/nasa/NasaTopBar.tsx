@@ -33,14 +33,14 @@ export const NasaTopBar: React.FC<NasaTopBarProps> = ({
 
   return (
     <header className="relative z-30 w-full px-6 lg:px-12 pt-6 pb-2 flex items-center justify-between pointer-events-auto">
-      {/* Left: ETHIODROUGHT Wordmark (Wide futuristic typography matching reference, no NASA logo) */}
+      {/* Left: Aether wordmark */}
       <Link href="/" className="flex items-center gap-3.5 group shrink-0">
         <div className="w-10 h-10 rounded-2xl overflow-hidden bg-panel-dark border-2 border-accent-cyan/50 shadow-[0_0_20px_rgba(40,215,197,0.35)] group-hover:border-accent-cyan group-hover:shadow-[0_0_25px_rgba(40,215,197,0.6)] transition-all shrink-0">
-          <img src="/logo.jpg" alt="ETHIODROUGHT" className="w-full h-full object-cover" />
+          <img src="/aether-logo.png" alt="Aether logo" className="w-full h-full object-contain p-0.5" />
         </div>
         <div className="flex flex-col">
           <span className="font-michroma text-xl lg:text-2xl font-bold tracking-[0.18em] text-[#FBFCFD] group-hover:text-accent-cyan transition-colors drop-shadow-[0_0_12px_rgba(255,255,255,0.2)]">
-            ETHIODROUGHT
+            AETHER
           </span>
           <span className="text-[9px] font-mono tracking-[0.3em] text-[#A8BFDC] uppercase opacity-80">
             {isAmharic ? "ከዝናብ ባሻገር · 2026" : "BEYOND RAINFALL · 2026"}

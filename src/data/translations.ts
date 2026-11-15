@@ -122,7 +122,7 @@ export interface TranslationDictionary {
 
 export const translations: Record<Language, TranslationDictionary> = {
   en: {
-    appName: "ETHIODROUGHT",
+    appName: "AETHER",
     tagline: "BEYOND RAINFALL",
     taglineSecondary: "Turning NASA Earth observations into understandable environmental intelligence for Ethiopia.",
     nav: {
@@ -136,7 +136,7 @@ export const translations: Record<Language, TranslationDictionary> = {
       datasets: "Datasets",
       data: "Data & Transparency",
       methodology: "Methodology",
-      about: "About ETHIODROUGHT",
+      about: "About Aether",
       lab: "Investigation Lab",
     },
     hero: {
@@ -215,7 +215,7 @@ export const translations: Record<Language, TranslationDictionary> = {
       modisTitle: "NASA MODIS MOD13A2 / MYD13A2 NDVI (1km / 0.05°)",
     },
     about: {
-      title: "About ETHIODROUGHT",
+      title: "About Aether",
       whyEthiopia: "Why Ethiopia? Pastoral Rangelands & Climate Stress",
       nasaRelevance: "NASA Space Apps 2026: Be An Earth System Trend Detective",
     },
@@ -241,7 +241,7 @@ export const translations: Record<Language, TranslationDictionary> = {
     },
   },
   am: {
-    appName: "ኢትዮ-ድርቅ (ETHIODROUGHT)",
+    appName: "AETHER",
     tagline: "ከዝናብ ባሻገር (BEYOND RAINFALL)",
     taglineSecondary: "የናሳ ሳተላይት መረጃዎችን ወደ ግልጽ የአካባቢና የድርቅ ሳይንሳዊ ግንዛቤ መቀየር።",
     nav: {
@@ -334,7 +334,7 @@ export const translations: Record<Language, TranslationDictionary> = {
       modisTitle: "ናሳ MODIS MOD13A2 የዕፅዋት ሽፋን (1km / 0.05°)",
     },
     about: {
-      title: "ስለ ኢትዮ-ድርቅ (ETHIODROUGHT)",
+      title: "ስለ AETHER",
       whyEthiopia: "ለምን ኢትዮጵያ? የአርብቶ አደር አካባቢዎችና የአየር ንብረት ጫና",
       nasaRelevance: "የናሳ ስፔስ አፕስ 2026 ውድድር ተሳትፎ",
     },

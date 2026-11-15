@@ -1,5 +1,5 @@
 /**
- * Types for ETHIODROUGHT Alert, Recovery Tracking, Priority Ranking, and Data Quality
+ * Types for Aether alerts, recovery tracking, priority ranking, and data quality
  */
 
 export type AlertClassification =

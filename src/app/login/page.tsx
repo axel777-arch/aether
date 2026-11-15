@@ -95,7 +95,7 @@ export default function LoginPage() {
         {/* Brand Header */}
         <div className="text-center space-y-3">
           <div className="w-14 h-14 rounded-2xl overflow-hidden bg-panel-dark border-2 border-accent-cyan/50 shadow-[0_0_20px_rgba(40,215,197,0.4)] mx-auto flex items-center justify-center">
-            <img src="/logo.jpg" alt="ETHIODROUGHT" className="w-full h-full object-cover" />
+            <img src="/aether-logo.png" alt="Aether logo" className="w-full h-full object-contain p-0.5" />
           </div>
 
           <div>

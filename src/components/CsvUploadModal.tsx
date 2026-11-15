@@ -41,7 +41,7 @@ export const CsvUploadModal: React.FC<CsvUploadModalProps> = ({
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", "ethiodrought_sample_schema.csv");
+    link.setAttribute("download", "aether_sample_schema.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -182,7 +182,7 @@ export const CsvUploadModal: React.FC<CsvUploadModalProps> = ({
         {/* Schema Instructions */}
         <div className="text-xs text-text-secondary space-y-1">
           <p>
-            Upload a CSV file conforming to the ETHIODROUGHT observation schema. Values will be ingested into the <strong>Drought Fingerprint Engine</strong> and <strong>Trend Detective</strong>.
+            Upload a CSV file conforming to the Aether observation schema. Values will be ingested into the <strong>Drought Fingerprint Engine</strong> and <strong>Trend Detective</strong>.
           </p>
           <div className="flex items-center justify-between text-[11px] pt-1">
             <span className="text-text-subtle font-bold">

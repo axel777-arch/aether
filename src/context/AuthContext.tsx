@@ -18,7 +18,7 @@ export const DEMO_USERS: Record<string, UserProfile> = {
   selamawit: {
     id: "usr_selamawit",
     name: "Dr. Selamawit Bekele",
-    email: "s.bekele@ethiodrought.org",
+    email: "s.bekele@aether.example",
     role: "Lead Drought Intelligence Scientist",
     organization: "EDRMC & NASA Harvest Consortium",
     focusRegion: "Borena & Somali Pastoral Belts",

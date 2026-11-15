@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Radio } from "lucide-react";
-
 interface MiniRadarCardProps {
   activeHotspotName?: string;
 }
@@ -28,9 +26,9 @@ export const MiniRadarCard: React.FC<MiniRadarCardProps> = ({
       <div className="flex items-center justify-between text-[10px] font-mono text-[#A8BFDC] z-10">
         <div className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-accent-cyan animate-pulse" />
-          <span className="tracking-wider uppercase">SENSOR RADAR SCAN</span>
+          <span className="tracking-wider uppercase">ANIMATED RADAR DEMO</span>
         </div>
-        <span className="text-accent-cyan font-bold">LIVE · 0.1° GPM</span>
+        <span className="text-accent-cyan font-bold">VISUAL ONLY</span>
       </div>
 
       {/* Center Radar Sweep Circle */}
@@ -65,8 +63,8 @@ export const MiniRadarCard: React.FC<MiniRadarCardProps> = ({
 
       {/* Telemetry Coordinates Footer */}
       <div className="flex items-center justify-between text-[9px] font-mono text-[#999CA0] z-10 pt-1 border-t border-[rgba(168,191,220,0.12)]">
-        <span>04°32&apos;N 38°18&apos;E</span>
-        <span className="text-[#A8BFDC]">STATION: YABELLO / TULA</span>
+        <span className="text-[#A8BFDC]">{activeHotspotName}</span>
+        <span>NO SENSOR TELEMETRY</span>
       </div>
     </div>
   );

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import type { MapLayerType } from "./LeafletMapInner";
-import { ArrowRight, CloudRain, Fingerprint, Layers, Sprout } from "lucide-react";
+import { ArrowRight, CloudRain, Map as MapIcon, Thermometer } from "lucide-react";
 
 const LeafletMapInner = dynamic(() => import("./LeafletMapInner"), {
   ssr: false,
@@ -19,10 +19,9 @@ interface HeroMapProps {
 }
 
 const layerOptions: { id: MapLayerType; label: string; icon: React.ReactNode }[] = [
-  { id: "fingerprint", label: "Combined evidence", icon: <Fingerprint className="w-3.5 h-3.5" /> },
+  { id: "normal", label: "Normal", icon: <MapIcon className="w-3.5 h-3.5" /> },
+  { id: "temperature", label: "Temperature", icon: <Thermometer className="w-3.5 h-3.5" /> },
   { id: "rainfall", label: "Rainfall", icon: <CloudRain className="w-3.5 h-3.5" /> },
-  { id: "soilMoisture", label: "Soil moisture", icon: <Layers className="w-3.5 h-3.5" /> },
-  { id: "vegetation", label: "Vegetation", icon: <Sprout className="w-3.5 h-3.5" /> },
 ];
 
 export const HeroMap: React.FC<HeroMapProps> = ({
@@ -36,7 +35,11 @@ export const HeroMap: React.FC<HeroMapProps> = ({
 
   return (
     <div className="relative w-full h-[580px] lg:h-[680px] rounded-3xl overflow-hidden border border-panel-border/40 bg-[#040507] shadow-2xl">
-      <LeafletMapInner selectedRegionId={selectedRegionId} onSelectRegion={onSelectRegion} />
+      <LeafletMapInner
+        selectedRegionId={selectedRegionId}
+        onSelectRegion={onSelectRegion}
+        selectedMapLayer={selectedLayer}
+      />
       <div className="absolute top-5 left-5 z-[600] max-w-[calc(100%-2.5rem)] flex flex-wrap gap-1.5 p-1.5 rounded-2xl bg-panel-dark/95 border border-panel-border/40">
         {layerOptions.map((layer) => (
           <button
@@ -53,7 +56,7 @@ export const HeroMap: React.FC<HeroMapProps> = ({
         ))}
       </div>
       <div className="absolute top-20 left-5 z-[600] rounded-xl bg-panel-dark/95 border border-amber-500/40 px-3 py-2 text-[10px] font-mono text-amber-200">
-        Candidate layers only — no verified observation data are loaded.
+        Historical summaries only; rainfall is an Ethiopia-wide value, not zone-specific.
       </div>
       <div className="absolute bottom-5 left-5 right-5 z-[600] flex flex-wrap gap-2">
         <input

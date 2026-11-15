@@ -3,47 +3,13 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import L from "leaflet";
 import overlay from "@/data/ethiopiaZoneDatasetOverlay.json";
+import { isEthiopiaZoneFeatureCollection, type EthiopiaZoneFeatureCollection } from "@/lib/zone-boundaries";
 
 type OverlayLayer = "soilMoisture" | "surfaceTemperature";
 type ZoneValue = { mean: number; gridCellCount: number } | null;
-type ZoneFeatureCollection = GeoJSON.FeatureCollection<
-  GeoJSON.Polygon | GeoJSON.MultiPolygon,
-  Record<string, unknown>
->;
+type ZoneFeatureCollection = EthiopiaZoneFeatureCollection;
 
 const PALETTE = ["#365c8d", "#277da1", "#43aa8b", "#f9c74f", "#f9844a"];
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function isPosition(value: unknown): value is GeoJSON.Position {
-  return Array.isArray(value) && value.length >= 2 &&
-    value.every((coordinate) => typeof coordinate === "number" && Number.isFinite(coordinate));
-}
-
-function isPolygonCoordinates(value: unknown): value is GeoJSON.Position[][] {
-  return Array.isArray(value) && value.length > 0 &&
-    value.every((ring) => Array.isArray(ring) && ring.length >= 4 && ring.every(isPosition));
-}
-
-function isMultiPolygonCoordinates(value: unknown): value is GeoJSON.Position[][][] {
-  return Array.isArray(value) && value.length > 0 && value.every(isPolygonCoordinates);
-}
-
-function isZoneFeatureCollection(value: unknown): value is ZoneFeatureCollection {
-  if (!isRecord(value) || value.type !== "FeatureCollection" || !Array.isArray(value.features)) return false;
-  return value.features.every((feature) => {
-    if (!isRecord(feature) || feature.type !== "Feature" || !isRecord(feature.properties) ||
-        !isRecord(feature.geometry)) return false;
-    const properties = feature.properties;
-    if (!["string", "number"].includes(typeof properties.ID_2) ||
-        typeof properties.NAME_1 !== "string" || typeof properties.NAME_2 !== "string") return false;
-    if (feature.geometry.type === "Polygon") return isPolygonCoordinates(feature.geometry.coordinates);
-    if (feature.geometry.type === "MultiPolygon") return isMultiPolygonCoordinates(feature.geometry.coordinates);
-    return false;
-  });
-}
 
 function getZoneValue(layer: OverlayLayer, id: string): ZoneValue {
   const entries = Object.entries(overlay.datasets[layer].zones);
@@ -113,7 +79,7 @@ export function ZoneDatasetOverlay() {
       .then(async (response) => {
         if (!response.ok) throw new Error(`Boundary request failed with HTTP ${response.status}.`);
         const payload: unknown = await response.json();
-        if (!isZoneFeatureCollection(payload) || payload.features.length !== overlay.boundary.featureCount) {
+        if (!isEthiopiaZoneFeatureCollection(payload, overlay.boundary.featureCount)) {
           throw new TypeError("The boundary file did not match the validated 72-zone GeoJSON structure.");
         }
         return payload;

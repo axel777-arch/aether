@@ -26,16 +26,15 @@ export function generateScientificExplanation(
   const { regionName, variableName, dateStr, rainfallZ, soilZ, vegZ, diagnosis, trendResult, periodLabel } = payload;
 
   if (mode === 'policy') {
-    // Humanitarian and Pastoral Briefing
-    const en = `Pastoral Advisory for ${regionName} (${dateStr}):
-${diagnosis.title.toUpperCase()} is detected. Standardized satellite metrics indicate rainfall anomaly at ${rainfallZ >= 0 ? '+' : ''}${rainfallZ.toFixed(2)}σ, root-zone soil moisture at ${soilZ >= 0 ? '+' : ''}${soilZ.toFixed(2)}σ, and rangeland vegetation health at ${vegZ >= 0 ? '+' : ''}${vegZ.toFixed(2)}σ.
+    const en = `Exploratory summary for ${regionName} (${dateStr}; ${periodLabel}):
+${diagnosis.title.toUpperCase()} is indicated by the input series. Standardized input values are rainfall ${rainfallZ >= 0 ? '+' : ''}${rainfallZ.toFixed(2)}σ, soil moisture ${soilZ >= 0 ? '+' : ''}${soilZ.toFixed(2)}σ, and vegetation ${vegZ >= 0 ? '+' : ''}${vegZ.toFixed(2)}σ. Inputs are not independently verified; this is not an official humanitarian advisory.
 ${diagnosis.summary}
-Recommended Action: ${diagnosis.agriculturalImplication}`;
+Potential implication to investigate: ${diagnosis.agriculturalImplication}`;
 
-    const am = `የአርብቶ አደርና እርዳታ አስቸኳይ መግለጫ ለ${regionName} (${dateStr})፡
-${diagnosis.titleAmharic} ተመዝግቧል። የሳተላይት መረጃዎች እንደሚያሳዩት የዝናብ ልዩነት ${rainfallZ >= 0 ? '+' : ''}${rainfallZ.toFixed(2)}σ፣ የአፈር እርጥበት ${soilZ >= 0 ? '+' : ''}${soilZ.toFixed(2)}σ፣ እንዲሁም የዕፅዋት ሽፋን ${vegZ >= 0 ? '+' : ''}${vegZ.toFixed(2)}σ ነው።
+    const am = `የምርመራ ማጠቃለያ ለ${regionName} (${dateStr}; ${periodLabel})፡
+${diagnosis.titleAmharic} በግቤት የጊዜ ተከታታይ ተጠቁሟል። የግቤት መደበኛ እሴቶች፡ ዝናብ ${rainfallZ >= 0 ? '+' : ''}${rainfallZ.toFixed(2)}σ፣ የአፈር እርጥበት ${soilZ >= 0 ? '+' : ''}${soilZ.toFixed(2)}σ፣ ዕፅዋት ${vegZ >= 0 ? '+' : ''}${vegZ.toFixed(2)}σ ናቸው። ግቤቶቹ በግል አልተረጋገጡም፤ ይህ ይፋዊ የሰብዓዊ ድጋፍ ምክር አይደለም።
 ${diagnosis.summaryAmharic}
-የሚመከር እርምጃ፡ ${diagnosis.agriculturalImplication}`;
+ሊመረመር የሚችል ተጽዕኖ፡ ${diagnosis.agriculturalImplication}`;
 
     return { english: en, amharic: am };
   }
@@ -44,22 +43,24 @@ ${diagnosis.summaryAmharic}
   let trendSectionEn = "";
   let trendSectionAm = "";
   if (trendResult) {
-    const trendWord = trendResult.trend === 'increasing' ? 'positive upward' : trendResult.trend === 'decreasing' ? 'statistically significant declining' : 'neutral, non-monotonic';
-    trendSectionEn = `\nLong-term trend detection across ${periodLabel} indicates a ${trendWord} trajectory for ${variableName} (Theil-Sen slope Q = ${trendResult.sensSlope > 0 ? '+' : ''}${trendResult.sensSlope.toFixed(5)} units/step, Mann-Kendall score S = ${trendResult.S}, standardized Z = ${trendResult.zScore.toFixed(2)}, two-tailed p = ${trendResult.pValue.toFixed(4)}, α = 0.05). ${trendResult.significant ? 'The null hypothesis of no trend is rejected at 95% confidence.' : 'Trend lacks statistical significance at the 95% confidence interval.'}`;
+    const trendWord = trendResult.trend === 'increasing' ? 'increasing' : trendResult.trend === 'decreasing' ? 'decreasing' : 'non-monotonic';
+    const significance = trendResult.significant ? 'statistically significant' : 'not statistically significant';
+    trendSectionEn = `\nTrend analysis of ${variableName} across ${periodLabel} indicates a ${trendWord} direction that is ${significance} at α = 0.05 (Theil-Sen slope Q = ${trendResult.sensSlope > 0 ? '+' : ''}${trendResult.sensSlope.toFixed(5)} units/step, Mann-Kendall score S = ${trendResult.S}, standardized Z = ${trendResult.zScore.toFixed(2)}, two-tailed p = ${trendResult.pValue.toFixed(4)}).`;
 
     const trendWordAm = trendResult.trend === 'increasing' ? 'እያደገ የሚሄድ' : trendResult.trend === 'decreasing' ? 'ቀጣይነት ያለው ቅናሽ የሚያሳይ' : 'የተረጋጋ ወይም ጉልህ ለውጥ የሌለው';
-    trendSectionAm = `\nበ${periodLabel} የጊዜ መስኮት ውስጥ የ${variableName} የለውጥ ሂደት ${trendWordAm} አዝማሚያ እንዳለው ያሳያል (የለውጥ ፍጥነት Sen's slope Q = ${trendResult.sensSlope.toFixed(5)}፣ የ Mann-Kendall እሴት S = ${trendResult.S}፣ Z = ${trendResult.zScore.toFixed(2)}፣ p = ${trendResult.pValue.toFixed(4)})።`;
+    const significanceAm = trendResult.significant ? 'በ α = 0.05 ስታትስቲካዊ ጉልህ ነው' : 'በ α = 0.05 ስታትስቲካዊ ጉልህ አይደለም';
+    trendSectionAm = `\nበ${periodLabel} የጊዜ መስኮት ውስጥ የ${variableName} አዝማሚያ ${trendWordAm} ነው፤ ${significanceAm} (Sen's slope Q = ${trendResult.sensSlope.toFixed(5)}፣ Mann-Kendall S = ${trendResult.S}፣ Z = ${trendResult.zScore.toFixed(2)}፣ p = ${trendResult.pValue.toFixed(4)})።`;
   }
 
-  const en = `Earth Observation Diagnostic (${regionName}, ${dateStr}):
-Multivariate anomaly convergence evaluates to ${diagnosis.title} (Phase: ${diagnosis.phase}).
+  const en = `Exploratory indicator diagnostic (${regionName}, ${dateStr}; ${periodLabel}):
+The input-series fingerprint indicates ${diagnosis.title} (Phase: ${diagnosis.phase}). Inputs have not been independently verified.
 ${diagnosis.scientificExplanation}
-Observed standardized departures: GPM Precipitation Z = ${rainfallZ.toFixed(2)}σ, FLDAS Noah Root-Zone Moisture Z = ${soilZ.toFixed(2)}σ, MODIS MOD13A2 NDVI Z = ${vegZ.toFixed(2)}σ against 2000–2020 monthly baselines.${trendSectionEn}`;
+Input standardized departures: precipitation Z = ${rainfallZ.toFixed(2)}σ, soil moisture Z = ${soilZ.toFixed(2)}σ, vegetation Z = ${vegZ.toFixed(2)}σ.${trendSectionEn}`;
 
-  const am = `የሳተላይት ምልከታ ሳይንሳዊ ምርመራ (${regionName}፣ ${dateStr})፡
-የተቀናጀ የጠቋሚዎች ትንተና ${diagnosis.titleAmharic} ያሳያል።
+  const am = `የግቤት ጠቋሚዎች የምርመራ ትንተና (${regionName}፣ ${dateStr}; ${periodLabel})፡
+የጊዜ ተከታታዩ የድርቅ አሻራ ${diagnosis.titleAmharic} ያመለክታል። ግቤቶቹ በግል አልተረጋገጡም።
 ${diagnosis.scientificExplanation}
-የሳተላይት መዛነፎች፡ የ GPM ዝናብ Z = ${rainfallZ.toFixed(2)}σ፣ የ FLDAS አፈር እርጥበት Z = ${soilZ.toFixed(2)}σ፣ የ MODIS NDVI Z = ${vegZ.toFixed(2)}σ።${trendSectionAm}`;
+የግቤት መደበኛ ልዩነቶች፡ ዝናብ Z = ${rainfallZ.toFixed(2)}σ፣ የአፈር እርጥበት Z = ${soilZ.toFixed(2)}σ፣ ዕፅዋት Z = ${vegZ.toFixed(2)}σ።${trendSectionAm}`;
 
   return { english: en, amharic: am };
 }

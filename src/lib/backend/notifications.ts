@@ -7,7 +7,7 @@ export const isSampleSmsMode = () => SMS_MODE === 'sample';
 export function generateSampleMessage(alert: StoredAlert): string {
   const region = alert.regionId === 'borena' ? 'Borena Zone, Oromia' : alert.regionId;
   return [
-    'ETHIODROUGHT SAMPLE ALERT',
+    'AETHER SAMPLE ALERT',
     `Reference: ${alert.reference}`,
     `Region: ${region}`,
     `Observation period: ${alert.observationPeriod}`,

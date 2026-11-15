@@ -367,7 +367,7 @@ async function getHandler(request: NextRequest, path: string[]) {
   if (path.length === 1 && path[0] === 'health') {
     return json({
       status: 'ok',
-      service: 'ethiodrought-api',
+      service: 'aether-api',
       version: 'v1',
       smsMode: SMS_MODE,
       emailMode: process.env.EMAIL_MODE === 'smtp' ? 'smtp_enabled' : 'disabled',
@@ -378,14 +378,14 @@ async function getHandler(request: NextRequest, path: string[]) {
     try {
       return json(await fetchBorenaNasaPowerObservations(), 200, request);
     } catch (error) {
-      console.error('ETHIODROUGHT NASA POWER retrieval failed:', error);
+      console.error('Aether NASA POWER retrieval failed:', error);
       return json({ error: 'nasa_power_retrieval_failed' }, 502, request);
     }
   }
   if (path.length === 1 && path[0] === 'metadata') {
     return json({
       apiVersion: 'v1',
-      service: 'ETHIODROUGHT backend',
+      service: 'Aether backend',
       smsMode: SMS_MODE,
       emailMode: process.env.EMAIL_MODE === 'smtp' ? 'smtp_enabled' : 'disabled',
       baselinePeriod: { startYear: BASELINE_START_YEAR, endYear: BASELINE_END_YEAR, minimumObservations: MIN_BASELINE_OBSERVATIONS },
@@ -717,7 +717,7 @@ async function postHandler(request: NextRequest, path: string[]) {
     try {
       generated = createSampleEmailAlert(alert);
     } catch (error) {
-      console.error('ETHIODROUGHT email configuration invalid:', error);
+      console.error('Aether email configuration invalid:', error);
       return json({ error: 'email_configuration_invalid' }, 503, request);
     }
     const emailAlert: StoredEmailAlert = {
@@ -820,7 +820,7 @@ async function postHandler(request: NextRequest, path: string[]) {
     try {
       transportConfig = getEmailTransportConfig();
     } catch (error) {
-      console.error('ETHIODROUGHT email configuration invalid:', error);
+      console.error('Aether email configuration invalid:', error);
       return json({ error: 'email_configuration_invalid' }, 503, request);
     }
     const claimed = await updateBackendState((state) => {
@@ -838,7 +838,7 @@ async function postHandler(request: NextRequest, path: string[]) {
     try {
       dispatch = await sendEmailAlert(claimed.emailAlert, transportConfig);
     } catch (error) {
-      console.error('ETHIODROUGHT email delivery failed:', error);
+      console.error('Aether email delivery failed:', error);
       await updateBackendState((state) => {
         const emailAlert = state.emailAlerts.find((item) => item.id === path[1]);
         if (emailAlert?.status === 'sending') {
@@ -980,7 +980,7 @@ export async function GET(request: NextRequest, context: ApiRouteContext) {
     const { path } = await context.params;
     return await getHandler(request, path);
   } catch (error) {
-    console.error('ETHIODROUGHT API GET failed:', error);
+    console.error('Aether API GET failed:', error);
     return json({ error: 'internal_server_error' }, 500, request);
   }
 }
@@ -990,7 +990,7 @@ export async function POST(request: NextRequest, context: ApiRouteContext) {
     const { path } = await context.params;
     return await postHandler(request, path);
   } catch (error) {
-    console.error('ETHIODROUGHT API POST failed:', error);
+    console.error('Aether API POST failed:', error);
     return json({ error: 'internal_server_error' }, 500, request);
   }
 }
@@ -1000,7 +1000,7 @@ export async function PATCH(request: NextRequest, context: ApiRouteContext) {
     const { path } = await context.params;
     return await patchHandler(request, path);
   } catch (error) {
-    console.error('ETHIODROUGHT API PATCH failed:', error);
+    console.error('Aether API PATCH failed:', error);
     return json({ error: 'internal_server_error' }, 500, request);
   }
 }

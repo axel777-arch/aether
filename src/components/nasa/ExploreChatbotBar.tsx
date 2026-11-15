@@ -18,72 +18,72 @@ const KB: { match: string[]; reply: string }[] = [
   {
     match: ["borena", "borana"],
     reply:
-      "🌍 **Borena Zone (Oromia)** is in the most critical drought state. Root-zone soil moisture (0–100 cm) sits at **0.142 m³/m³** — that's **2.14 σ below the 2000–2020 baseline**. Despite scattered showers, subterranean water storage has collapsed across all 8 pastoral woredas. Livestock mortality risk is HIGH.",
+      "Borena is the prototype's focus area. The map shows administrative boundaries only; this app does not provide verified current drought conditions for Borena. See /datasets for data coverage and integration status.",
   },
   {
     match: ["soil", "moisture", "fldas", "noah"],
     reply:
-      "💧 **Soil moisture** across southern Ethiopia is tracked using NASA FLDAS Noah LSM at 0–100 cm depth. This captures root-zone water that sustains pasture and crops — unlike surface rainfall, it reflects **accumulated water stress over weeks**. Borena reads 0.142 m³/m³ vs. the 0.312 m³/m³ long-term mean.",
+      "Soil moisture is an important drought indicator, but FLDAS is not an active live feed in this app. The /data page includes historical MERRA-2 spatial summaries averaged over 2000–2025; those are not monthly observations or a current anomaly.",
   },
   {
     match: ["rain", "rainfall", "precipitation", "gpm", "imerg"],
     reply:
-      "🌧️ **GPM IMERG V07** satellite data shows a **–1.82 σ precipitation anomaly** over Borena — meaning only **32.4 mm** fell where **74.5 mm** is expected. But rainfall is just one piece: two consecutive failed monsoons (2022 Deyr, 2023 Belg) have drained soil reserves even where brief rains occurred.",
+      "The predictor displays a historical GPM-based result for June 2025. It is not a current forecast or a zone-level rainfall observation. Check /datasets for source coverage and /predict for the prototype output.",
   },
   {
     match: ["ndvi", "vegetation", "veg", "plant", "modis", "canopy"],
     reply:
-      "🌿 **MODIS NDVI (MOD13A2)** measures canopy greenness at 1 km / 16-day resolution. Borena's NDVI sits at **0.375** — a **–1.65 σ anomaly** indicating severe pasture degradation. Afar reads even lower at 0.210 (–1.90 σ), reflecting hyper-arid scrubland collapse that livestock cannot recover from without intervention.",
+      "NDVI can indicate vegetation greenness, but this prototype does not provide a verified, current MODIS time series or zone-level vegetation anomaly. See /datasets for the status of each source.",
   },
   {
     match: ["afar", "northern"],
     reply:
-      "⚠️ **Afar (North)** is the most critical zone on all three sensors: rainfall at **–1.95 σ**, soil moisture at **0.118 m³/m³ (–2.40 σ)**, and NDVI at **0.210 (–1.90 σ)**. The hyper-arid scrubland has experienced 6 consecutive months below baseline — livestock hydration sources are critically low.",
+      "Afar is included in the geographic context, but the prototype has no verified live three-indicator assessment or current severity ranking for the region. Please do not interpret the map markers as observations.",
   },
   {
     match: ["somali", "fafan", "ogaden"],
     reply:
-      "🏜️ **Somali Region / Fafan Zone** shows HIGH-level drought: rainfall anomaly **–1.45 σ**, soil moisture **0.155 m³/m³ (–1.80 σ)**, NDVI **0.290 (–1.35 σ)**. Lowland pastoral communities and riverine recharge zones are most affected. Groundwater recharge has not occurred in 2 consecutive wet seasons.",
+      "The map provides geographic context for Somali Region, not a current drought classification. This app does not have verified zone-level rainfall, soil moisture, and vegetation observations to support a severity statement.",
   },
   {
     match: ["tigray", "highland"],
     reply:
-      "📊 **Tigray (Central)** is in MODERATE drought: rainfall **–0.92 σ**, soil moisture **0.210 m³/m³ (–0.85 σ)**, NDVI **0.480 (–0.60 σ)**. Highland terraced agriculture faces Kiremt shortfall stress. Woreda-level monitoring is active across Enderta, Kola Tembien, and Tanqua Abergele.",
+      "Tigray is shown as part of the administrative geography. No verified current drought status or woreda-level environmental monitoring is provided by this prototype.",
   },
   {
     match: ["severe", "critical", "worst", "emergency", "alert"],
     reply:
-      "🚨 **Compound drought emergency** is active across southern Ethiopia. Ranked by severity:\n1. **AFAR NORTH** — Critical (all 3 indicators > 1.9 σ below baseline)\n2. **BORENA** — Severe (soil moisture at –2.14 σ)\n3. **SOMALI / FAFAN** — High\n4. **TIGRAY** — Moderate\n\nVisit the Alerts page for real-time monitoring.",
+      "This prototype does not publish verified live drought alerts or rank regions by current severity. Visit /alerts to review the available alert-system interface; do not treat it as an active monitoring feed.",
   },
   {
     match: ["satellite", "sensor", "data", "source", "nasa"],
     reply:
-      "🛰️ ETHIODROUGHT fuses **3 NASA/ESA satellite datasets**:\n• **GPM IMERG V07** — Global precipitation at 0.1° / 30-min\n• **NASA FLDAS Noah LSM** — Root-zone soil moisture (0–100 cm)\n• **MODIS MOD13A2** — 16-day NDVI at 1 km resolution\n\nAll data spans 2000–2024 and is processed through Mann-Kendall trend analysis.",
+      "The dataset registry separates integrated products from research references and planned sources. This prototype does not fuse live GPM, FLDAS, and MODIS observations. Visit /datasets to review each source's documented status and coverage.",
   },
   {
     match: ["mann-kendall", "trend", "statistics", "sen", "slope"],
     reply:
-      "📈 The **Mann-Kendall test** is a non-parametric method to detect monotonic trends. It doesn't assume normal data distribution, making it ideal for noisy climate signals. **Sen's Slope** (Q = median of all pairwise slopes) gives the rate of change per year. NDVI in Borena shows –0.0142/decade — a statistically significant drying trend (p < 0.001).",
+      "Mann–Kendall is a non-parametric test for monotonic trends, and Sen's slope estimates a trend magnitude from pairwise slopes. This general method description is not a claim that a verified NDVI trend has been calculated for Borena. See /methodology for the prototype's documented methods.",
   },
   {
     match: ["why", "enough", "alone", "just rainfall"],
     reply:
-      "💡 **Rainfall alone is misleading.** In 2023, parts of Borena recorded near-normal rain — yet drought conditions persisted. Why?\n1. **Soil memory** — decades of overgrazing stripped topsoil water retention\n2. **Timing** — brief intense rain runs off; it doesn't recharge root-zone moisture\n3. **Vegetation lag** — degraded pasture can't recover from a single good rain\n\nThis is the core insight of ETHIODROUGHT: it takes 3 sensors to see the full picture.",
+      "Rainfall alone cannot describe every drought impact: soil moisture and vegetation can respond differently and on different timescales. Aether is designed to investigate those relationships, but this prototype does not yet provide a verified live three-indicator time series.",
   },
   {
     match: ["methodology", "how", "calculated", "method", "algorithm"],
     reply:
-      "🔬 ETHIODROUGHT's methodology combines:\n1. **Anomaly detection** — Z-score standardization vs. 2000–2020 climatological mean\n2. **Compound drought index** — When all 3 indicators fall below –1.5 σ simultaneously\n3. **Mann-Kendall trend analysis** — Non-parametric, autocorrelation-resistant\n4. **Spatial aggregation** — Zone-level averages from pixel-level satellite products",
+      "The methodology page describes the scientific approach and its limitations. The app's current datasets are not a complete, live three-indicator analysis, so do not interpret planned methods as completed measurements.",
   },
   {
     match: ["lab", "investigation", "workbench", "experiment", "simulator", "synthetic", "custom data"],
     reply:
-      "🧪 The **Drought Investigation Lab** is our hands-on interactive scientific workbench at **/lab**! Features include:\n• **Map Canvas**: click anywhere in Ethiopia, choose your radius (25–600 km)\n• **Time Scrubber**: step or play month-by-month through 15+ years\n• **Drought Fingerprint**: matrix showing which sensor departed first (Precip vs Soil vs NDVI)\n• **Lead/Lag Analysis**: cross-correlations revealing signal lags\n• **Custom Data**: drag & drop your own CSV or run synthetic demos.\n\nVisit **/lab** to start an investigation!",
+      "The /lab page is an exploratory prototype. Treat sample or synthetic outputs as demonstrations, not measured environmental conditions, unless the page explicitly identifies a verified data source.",
   },
   {
     match: ["help", "what can", "commands", "options", "ask"],
     reply:
-      "🤖 I can answer questions about:\n• **Drought zones** — Borena, Afar, Somali, Tigray\n• **Satellite data** — GPM rainfall, FLDAS soil moisture, MODIS NDVI\n• **Statistics** — Mann-Kendall trends, anomalies, Sen's slope\n• **Why rainfall alone isn't enough**\n\nTry: *\"Why is Borena so critical?\"* or *\"Explain the soil moisture situation\"*",
+      "I can explain administrative boundaries, the documented dataset registry, the historical rainfall prototype, and general drought-analysis methods. I cannot verify current drought severity or live environmental conditions.",
   },
 ];
 
@@ -94,14 +94,14 @@ function getReply(text: string): string {
       return entry.reply;
     }
   }
-  return "🛰️ I didn't catch a specific drought topic there. Try asking about **Borena**, **soil moisture**, **rainfall anomalies**, **NDVI vegetation**, or a specific zone like **Afar** or **Somali**. You can also type **help** to see what I know.";
+  return "I can explain the map, dataset registry, historical rainfall prototype, or general drought methods. I do not have live environmental observations; type “help” for topics.";
 }
 
 const QUICK_CHIPS = [
   "What is the Investigation Lab?",
   "Why is Borena so critical?",
   "What does soil moisture mean?",
-  "Which zone is worst?",
+  "Is there a live drought ranking?",
   "Why isn't rainfall enough?",
   "How is data calculated?",
 ];
@@ -115,7 +115,7 @@ export const ExploreChatbotBar: React.FC<ExploreChatbotBarProps> = ({
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "ai",
-      text: "👋 Welcome to **ETHIODROUGHT Earth Intelligence**. I can explain drought conditions across Ethiopia — just ask about any region, satellite data, or indicator. Try a quick question below, or type your own!",
+      text: "Welcome. I'm a prototype guide to the map and documented datasets, not a live drought-monitoring system. Ask about data coverage, boundaries, or general analysis methods.",
     },
   ]);
 
@@ -178,7 +178,7 @@ export const ExploreChatbotBar: React.FC<ExploreChatbotBarProps> = ({
             <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(168,191,220,0.12)]">
               <span className="text-accent-cyan flex items-center gap-1.5 text-xs font-mono font-bold">
                 <Sparkles className="w-3.5 h-3.5" />
-                EARTH INTELLIGENCE · ETHIODROUGHT AI
+                PROTOTYPE GUIDE · NOT LIVE ANALYSIS
               </span>
               <button
                 onClick={() => setChatOpen(false)}

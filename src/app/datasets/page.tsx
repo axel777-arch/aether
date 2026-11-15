@@ -91,7 +91,7 @@ export default function DatasetsPage() {
               Dataset Explorer
             </h1>
             <p className="text-sm sm:text-base text-text-secondary leading-relaxed">
-              Transparent catalog of satellite constellations, land surface models, climate indices, and hydrological archives utilized by the ETHIODROUGHT Earth System Intelligence platform.
+              Transparent catalog of satellite constellations, land surface models, climate indices, and hydrological archives evaluated for the Aether Earth System Intelligence platform.
             </p>
           </div>
 

@@ -14,7 +14,6 @@ import {
   Clock, 
   MapPin, 
   FileText, 
-  CheckCircle2,
   BookOpen
 } from "lucide-react";
 
@@ -61,7 +60,7 @@ export const InsightsPanel: React.FC<InsightsPanelProps> = ({
           </h3>
         </div>
         <span className="px-2 py-0.5 text-[9px] font-mono tracking-widest uppercase bg-accent-cyan/20 text-accent-cyan rounded-full border border-accent-cyan/40">
-          REAL-TIME ENGINE
+          INPUT SERIES · UNVERIFIED
         </span>
       </div>
 
@@ -124,7 +123,13 @@ export const InsightsPanel: React.FC<InsightsPanelProps> = ({
               EARTH SYSTEM TREND DETECTIVE
             </span>
             <h4 className="text-sm font-bold text-text-primary tracking-wide">
-              {isDeclining ? "Persistent Downward Trajectory" : isIncreasing ? "Positive Moisture Accumulation" : "Equilibrium Trend"}
+              {!trendResult.significant
+                ? "No statistically significant trend"
+                : isDeclining
+                  ? "Significant downward trend"
+                  : isIncreasing
+                    ? "Significant upward trend"
+                    : "No monotonic trend"}
             </h4>
           </div>
           <button
@@ -166,7 +171,7 @@ export const InsightsPanel: React.FC<InsightsPanelProps> = ({
             GEOGRAPHIC TARGET
           </span>
           <span className="text-[10px] text-emerald-400 flex items-center gap-1 font-bold">
-            <CheckCircle2 className="w-3 h-3" /> VERIFIED ARCHIVE
+            <AlertTriangle className="w-3 h-3" /> NOT INDEPENDENTLY VERIFIED
           </span>
         </div>
         <div className="text-sm font-bold text-text-primary flex items-center gap-1.5">
@@ -175,7 +180,7 @@ export const InsightsPanel: React.FC<InsightsPanelProps> = ({
         </div>
         <div className="text-[10px] text-text-secondary mt-1 flex items-center gap-2">
           <Clock className="w-3 h-3 text-accent-secondary" />
-          <span>Latest: {observationDate} (Monthly Sync)</span>
+          <span>Selected record: {observationDate}</span>
         </div>
       </div>
 
@@ -214,7 +219,7 @@ export const InsightsPanel: React.FC<InsightsPanelProps> = ({
             <BookOpen className="w-3 h-3" />
             <span>Methodology & Caveats</span>
           </button>
-          <span className="text-text-subtle font-mono">NASA EARTHDATA</span>
+          <span className="text-text-subtle font-mono">SOURCE NOT ATTACHED</span>
         </div>
       </div>
     </aside>

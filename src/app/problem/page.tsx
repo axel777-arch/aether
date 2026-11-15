@@ -292,16 +292,22 @@ export default function ProblemPage() {
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-accent-cyan animate-pulse" />
                 <span className="text-xs font-mono text-accent-cyan uppercase tracking-widest">
-                  {isAmharic ? "ወቅታዊ ምልከታዎችና ትንበያዎች (2026)" : "CURRENT OBSERVATIONS & FORECASTS · 2026 SEASON"}
+                  {isAmharic ? "የምሳሌ ሁኔታዎች · የቀጥታ ክትትል አይደሉም" : "ILLUSTRATIVE SCENARIOS · NOT LIVE OBSERVATIONS"}
                 </span>
               </div>
               <h2 className="font-heading text-2xl lg:text-3xl font-bold text-[#FBFCFD]">
-                {isAmharic ? "የ 2026 የዝናብና የአፈር ሁኔታዎች" : "Emerging Environmental Stresses Across Ethiopia"}
+                {isAmharic ? "የምሳሌ የአካባቢ ጫና ሁኔታዎች" : "Example Environmental Stress Scenarios"}
               </h2>
             </div>
             <span className="px-3 py-1 rounded-full bg-accent-cyan/10 border border-accent-cyan/30 text-[11px] font-mono text-accent-cyan">
-              {isAmharic ? "የአሁኑ መረጃ (2026)" : "ACTIVE 2026 MONITORING CYCLE"}
+              {isAmharic ? "ያልተረጋገጡ ምሳሌዎች" : "UNVERIFIED EXAMPLES"}
             </span>
+          </div>
+
+          <div role="note" className="rounded-xl border border-amber-500/40 bg-amber-950/30 p-4 text-sm text-amber-100">
+            {isAmharic
+              ? "ከታች ያሉት የ2026 ጽሑፎች ያልተረጋገጡ ምሳሌዎች ናቸው። የቀጥታ ምልከታ ወይም ትንበያ ከዚህ መተግበሪያ ጋር አልተገናኘም።"
+              : "The 2026 narratives below are unverified static examples. No current observations or forecasts are connected to this app."}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -325,8 +331,8 @@ export default function ProblemPage() {
               </p>
 
               <div className="pt-3 border-t border-[rgba(168,191,220,0.1)] flex items-center justify-between text-[11px] font-mono text-[#999CA0]">
-                <span>{isAmharic ? "ምንጭ፡ FEWS NET 2026" : "Source: FEWS NET Ethiopia Food Security Outlook"}</span>
-                <span className="text-amber-400 font-semibold">CROP STRESS</span>
+                <span>{isAmharic ? "ያልተረጋገጠ የምሳሌ ጽሑፍ" : "Unverified static example"}</span>
+                <span className="text-amber-400 font-semibold">EXAMPLE</span>
               </div>
             </div>
 
@@ -350,8 +356,8 @@ export default function ProblemPage() {
               </p>
 
               <div className="pt-3 border-t border-[rgba(168,191,220,0.1)] flex items-center justify-between text-[11px] font-mono text-[#999CA0]">
-                <span>{isAmharic ? "ምንጭ፡ FEWS NET / WFP" : "Source: FEWS NET Pastoral Assessment"}</span>
-                <span className="text-red-400 font-semibold">PASTORAL ALERT</span>
+                <span>{isAmharic ? "ያልተረጋገጠ የምሳሌ ጽሑፍ" : "Unverified static example"}</span>
+                <span className="text-red-400 font-semibold">EXAMPLE</span>
               </div>
             </div>
 
@@ -375,8 +381,8 @@ export default function ProblemPage() {
               </p>
 
               <div className="pt-3 border-t border-[rgba(168,191,220,0.1)] flex items-center justify-between text-[11px] font-mono text-[#999CA0]">
-                <span>{isAmharic ? "ምንጭ፡ NASA FLDAS Noah" : "Source: NASA FLDAS Noah LSM Hydrology"}</span>
-                <span className="text-accent-cyan font-semibold">-2.14 σ DEPLETED</span>
+                <span>{isAmharic ? "ያልተረጋገጠ የምሳሌ ጽሑፍ" : "Unverified static example"}</span>
+                <span className="text-accent-cyan font-semibold">EXAMPLE</span>
               </div>
             </div>
           </div>

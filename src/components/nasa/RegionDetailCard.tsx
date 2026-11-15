@@ -21,7 +21,7 @@ export const RegionDetailCard: React.FC<RegionDetailCardProps> = ({
       <div className="flex items-start justify-between pb-3">
         <div>
           <span className="text-[11px] font-mono tracking-widest text-[#999CA0] uppercase block mb-1">
-            Code
+            Illustrative location
           </span>
           <h2 className="font-michroma text-xl tracking-wider font-bold text-[#FBFCFD]">
             {hotspot.name}
@@ -40,7 +40,7 @@ export const RegionDetailCard: React.FC<RegionDetailCardProps> = ({
         {/* Row 1: Precipitation Anomaly & Soil Moisture */}
         <div>
           <span className="text-[10px] font-sans text-[#999CA0] block leading-tight">
-            Rainfall anomaly
+            Rainfall anomaly · unavailable
           </span>
           <div className="font-michroma text-lg font-bold text-accent-cyan mt-0.5">
             {hotspot.anomaly}
@@ -49,7 +49,7 @@ export const RegionDetailCard: React.FC<RegionDetailCardProps> = ({
 
         <div>
           <span className="text-[10px] font-sans text-[#999CA0] block leading-tight">
-            Root-zone soil
+            Soil moisture · unavailable
           </span>
           <div className="font-michroma text-sm font-bold text-sky-400 mt-0.5 leading-tight">
             {hotspot.soil}
@@ -59,16 +59,16 @@ export const RegionDetailCard: React.FC<RegionDetailCardProps> = ({
         {/* Row 2: Observation Window & Drought Status */}
         <div>
           <span className="text-[10px] font-sans text-[#999CA0] block leading-tight">
-            Obs. epoch
+            Observation period
           </span>
           <div className="font-michroma text-base font-bold text-[#FBFCFD] mt-0.5">
-            92 days
+            Not connected
           </div>
         </div>
 
         <div>
           <span className="text-[10px] font-sans text-[#999CA0] block leading-tight">
-            Drought status
+            Verified status
           </span>
           <div className="font-michroma text-base font-bold text-amber-400 mt-0.5">
             {hotspot.status}

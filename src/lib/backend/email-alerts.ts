@@ -25,9 +25,9 @@ export function createSampleEmailAlert(alert: StoredAlert): Pick<StoredEmailAler
   const region = alert.regionId === 'borena' ? 'Borena Zone, Oromia' : alert.regionId;
   return {
     recipient: getAlertEmailRecipient(),
-    subject: `[ETHIODROUGHT SAMPLE] Workflow notification for ${region}`,
+    subject: `[AETHER SAMPLE] Workflow notification for ${region}`,
     text: [
-      'ETHIODROUGHT SAMPLE EMAIL ALERT',
+      'AETHER SAMPLE EMAIL ALERT',
       `Reference: ${alert.reference}`,
       `Region: ${region}`,
       `Observation period: ${alert.observationPeriod}`,

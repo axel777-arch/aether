@@ -182,11 +182,32 @@ function dateRange(rows, dateKey) {
   return { start: dates[0], end: dates[dates.length - 1], validDateCount: dates.length };
 }
 
+function summarizeObservations(rows, dateKey, valueKey) {
+  const observations = rows
+    .map((row) => ({ date: row[dateKey], value: Number(row[valueKey]) }))
+    .filter((observation) =>
+      /^\d{4}-\d{2}-\d{2}$/.test(observation.date) && Number.isFinite(observation.value),
+    )
+    .sort((first, second) => first.date.localeCompare(second.date));
+  if (observations.length === 0) {
+    throw new TypeError(`Expected at least one valid ${dateKey}/${valueKey} observation.`);
+  }
+  const values = observations.map((observation) => observation.value);
+  return {
+    latestObservation: observations[observations.length - 1],
+    valueRange: {
+      minimum: Math.min(...values),
+      maximum: Math.max(...values),
+    },
+  };
+}
+
 function buildZoneOverlay({ geoJson, rainfallRows, soilRows, temperatureRows }) {
   const features = validateFeatures(geoJson);
   const soilMetadata = soilRows[0];
   const temperatureMetadata = temperatureRows[0];
   const rainfallMetadata = rainfallRows[0];
+  const rainfallSummary = summarizeObservations(rainfallRows, 'date', 'precipitation_value');
 
   return {
     schemaVersion: 1,
@@ -223,6 +244,7 @@ function buildZoneOverlay({ geoJson, rainfallRows, soilRows, temperatureRows }) 
         temporalCoverage: dateRange(rainfallRows, 'date'),
         spatiallyMappableToZones: false,
         reason: 'One Ethiopia bounding-box average is provided per date; the file has no gridded or zone-level rainfall values, and its units are not stated.',
+        ...rainfallSummary,
       },
     },
     trainingReadiness: {

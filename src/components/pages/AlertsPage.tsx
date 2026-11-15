@@ -39,7 +39,7 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({ lang }) => {
   const selectedAlert = SAMPLE_ALERTS.find((a) => a.id === selectedAlertId) || SAMPLE_ALERTS[0];
 
   // Editable SMS message state
-  const defaultSmsText = `ETHIODROUGHT SAMPLE ONLY: Fictional workflow scenario for ${selectedAlert.regionName} (${selectedAlert.observationPeriod}). No environmental measurements were analyzed and no drought condition was detected. Not an operational warning. Scenario: ${selectedAlert.referenceNumber}.`;
+  const defaultSmsText = `AETHER SAMPLE ONLY: Fictional workflow scenario for ${selectedAlert.regionName} (${selectedAlert.observationPeriod}). No environmental measurements were analyzed and no drought condition was detected. Not an operational warning. Scenario: ${selectedAlert.referenceNumber}.`;
 
   const [smsDraft, setSmsDraft] = useState<string>(defaultSmsText);
   const [copied, setCopied] = useState<boolean>(false);
@@ -67,7 +67,7 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({ lang }) => {
   // Update draft when alert selection changes
   const handleSelectAlert = (alert: EnvironmentalAlert) => {
     setSelectedAlertId(alert.id);
-    const newText = `ETHIODROUGHT SAMPLE ONLY: Fictional workflow scenario for ${alert.regionName} (${alert.observationPeriod}). No environmental measurements were analyzed and no drought condition was detected. Not an operational warning. Scenario: ${alert.referenceNumber}.`;
+    const newText = `AETHER SAMPLE ONLY: Fictional workflow scenario for ${alert.regionName} (${alert.observationPeriod}). No environmental measurements were analyzed and no drought condition was detected. Not an operational warning. Scenario: ${alert.referenceNumber}.`;
     setSmsDraft(newText);
   };
 
@@ -124,7 +124,7 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({ lang }) => {
               </span>
             </div>
             <h1 className="text-2xl lg:text-3xl font-bold text-text-primary tracking-wide">
-              ETHIODROUGHT ALERT
+              AETHER ALERT
             </h1>
             <p className="text-xs text-text-secondary mt-1 max-w-3xl leading-relaxed">
               Workflow prototype only. The examples below use fictional inputs and are not linked to NASA observations, current conditions, or verified authority contacts.
@@ -464,7 +464,7 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({ lang }) => {
             {
               step: "02",
               title: "Draft Advisory",
-              desc: "ETHIODROUGHT engine synthesizes standard notification with report ID.",
+              desc: "Aether engine synthesizes standard notification with report ID.",
             },
             {
               step: "03",
@@ -505,7 +505,7 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({ lang }) => {
           1. <strong>Indicators vs Direct Impact:</strong> Satellite observations measure atmospheric precipitation, root-zone soil moisture, and canopy optical reflectance. They are indicators of environmental conditions and do not constitute direct field confirmation of crop failure, livestock deaths, or household hunger.
         </p>
         <p>
-          2. <strong>Non-Official Designation:</strong> ETHIODROUGHT alerts are environmental monitoring notifications developed for research and early warning intelligence. They are not official government warnings, emergency decrees, or humanitarian appeals.
+          2. <strong>Non-Official Designation:</strong> Aether alerts are environmental monitoring notifications developed for research and early warning intelligence. They are not official government warnings, emergency decrees, or humanitarian appeals.
         </p>
         <p>
           3. <strong>Demonstration Status:</strong> All messages generated on this page are sample demonstrations only. The platform does not replace or interfere with official Ethiopian disaster management channels (such as EDRMC or regional DRMC bureaus).

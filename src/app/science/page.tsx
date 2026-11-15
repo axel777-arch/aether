@@ -53,6 +53,12 @@ export default function SciencePage() {
       </div>
 
       <div className="relative z-10 max-w-[1440px] mx-auto px-6 lg:px-12 pt-12 space-y-20">
+        <div role="note" className="rounded-xl border border-amber-500/40 bg-amber-950/30 p-4 text-sm text-amber-100">
+          {isAmharic
+            ? "ማሳሰቢያ፡ በዚህ ገጽ ያሉ ቁጥሮችና ግራፎች ምሳሌዎች ናቸው፤ የተረጋገጡ ወይም ወቅታዊ ሳተላይት ምልከታዎች አይደሉም።"
+            : "Demonstration only: figures and charts on this page are illustrative examples, not verified or current satellite observations."}
+        </div>
+
         {/* ========================================================
             HERO: UNDERSTANDING THE PROBLEM
             ======================================================== */}
@@ -60,7 +66,7 @@ export default function SciencePage() {
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-accent-blue/20 border border-accent-blue/35 text-accent-cyan text-xs font-mono tracking-wider">
             <Sparkles className="w-4 h-4 text-accent-cyan" />
             <span>
-              {isAmharic ? "የምድር ምልከታ ሳይንስ · ባለሦስት መስፈርት ትንተና" : "EARTH OBSERVATION SCIENCE · TRIPLE-SENSOR SYNTHESIS"}
+              {isAmharic ? "የሳይንስ ምሳሌዎች · የቀጥታ ውሂብ አይደሉም" : "ILLUSTRATIVE SCIENCE EXAMPLES · NOT LIVE DATA"}
             </span>
           </div>
 
@@ -81,13 +87,13 @@ export default function SciencePage() {
           <p className="text-base sm:text-lg text-[#A8BFDC] max-w-2xl mx-auto leading-relaxed font-sans">
             {isAmharic
               ? "ድርቅ የዝናብ እጥረት ብቻ አይደለም። ዝናብ፣ የአፈር እርጥበት እና የዕፅዋት ጤና እያንዳንዳቸው የተለያየ ታሪክ ይናገራሉ። እውነተኛውን የድርቅ አደጋ ለመረዳት ሦስቱንም በአንድ ላይ ማየት ግድ ይላል።"
-              : "Drought is an intricate multi-dimensional environmental phenomenon. Standard surface rain measurements often generate false alarms or miss subterranean water crises. ETHIODROUGHT decodes how rainfall, soil moisture, and canopy vigor interact."}
+              : "Drought is an intricate multi-dimensional environmental phenomenon. Standard surface rain measurements often generate false alarms or miss subterranean water crises. Aether is designed to investigate how rainfall, soil moisture, and canopy vigor interact."}
           </p>
 
           {/* Large Editorial Pull Quote */}
           <div className="nasa-reference-glass p-8 rounded-3xl border-l-4 border-l-accent-cyan text-left max-w-3xl mx-auto mt-8 shadow-2xl">
             <span className="text-xs font-mono uppercase text-accent-cyan tracking-widest block mb-2">
-              {isAmharic ? "ሳይንሳዊ ምልከታ · ቦረና 2023" : "EMPIRICAL ANOMALY · BORENA CASE STUDY"}
+              {isAmharic ? "ምሳሌ እሴቶች · የተረጋገጡ መለኪያዎች አይደሉም" : "ILLUSTRATIVE VALUES · NOT VERIFIED OBSERVATIONS"}
             </span>
             <blockquote className="text-lg sm:text-xl font-heading font-medium text-[#FBFCFD] leading-relaxed italic">
               {isAmharic
@@ -112,7 +118,7 @@ export default function SciencePage() {
                   01 · PRECIPITATION ANOMALIES
                 </span>
                 <span className="px-2.5 py-0.5 rounded-full bg-panel-dark border border-white/10 text-[10px] font-mono text-[#A8BFDC]">
-                  NASA GPM IMERG V07 · 0.1°
+                  Candidate: NASA GPM IMERG V07 · 0.1°
                 </span>
               </div>
 
@@ -142,7 +148,7 @@ export default function SciencePage() {
 
                 <div className="p-4 rounded-2xl bg-[#121929] border border-[rgba(168,191,220,0.14)]">
                   <span className="text-[10px] font-mono uppercase text-[#999CA0] block mb-1">
-                    {isAmharic ? "ቦረና የተመዘገበ ልዩነት" : "BORENA OBSERVED ANOMALY"}
+                    {isAmharic ? "የቦረና ምሳሌ ልዩነት" : "BORENA ILLUSTRATIVE ANOMALY"}
                   </span>
                   <div className="font-mono text-xl text-red-400 font-bold">
                     -1.82 σ (Severe Deficit)
@@ -214,7 +220,7 @@ export default function SciencePage() {
                   02 · ROOT-ZONE SOIL MOISTURE
                 </span>
                 <span className="px-2.5 py-0.5 rounded-full bg-panel-dark border border-white/10 text-[10px] font-mono text-[#A8BFDC]">
-                  NASA FLDAS Noah LSM · 0-100cm
+                  Candidate: NASA FLDAS Noah LSM · 0-100cm
                 </span>
               </div>
 
@@ -232,7 +238,7 @@ export default function SciencePage() {
               <div className="p-4 rounded-2xl bg-[#121929] border border-[rgba(168,191,220,0.14)] flex items-center justify-between">
                 <div>
                   <span className="text-[10px] font-mono text-[#999CA0] uppercase block">
-                    {isAmharic ? "የቦረና የአፈር እርጥበት መጠን" : "BORENA CURRENT ROOT-ZONE STORAGE"}
+                    {isAmharic ? "የቦረና ምሳሌ የአፈር እርጥበት" : "BORENA ILLUSTRATIVE ROOT-ZONE EXAMPLE"}
                   </span>
                   <div className="font-heading text-2xl font-bold text-accent-cyan mt-0.5">
                     0.142 m³/m³
@@ -242,8 +248,8 @@ export default function SciencePage() {
                   </span>
                 </div>
                 <div className="text-right font-mono text-xs text-[#A8BFDC]">
-                  <div>Critical Deficit: -54.5%</div>
-                  <div className="text-[10px] text-[#999CA0]">Tula well collapse</div>
+                  <div>Illustrative deficit: -54.5%</div>
+                  <div className="text-[10px] text-[#999CA0]">Not a verified field measurement</div>
                 </div>
               </div>
             </div>
@@ -257,7 +263,7 @@ export default function SciencePage() {
               {/* Tank Bar */}
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-mono">
-                  <span className="text-accent-cyan">Current: 0.142 m³/m³</span>
+                  <span className="text-accent-cyan">Example: 0.142 m³/m³</span>
                   <span className="text-[#999CA0]">Normal: 0.312 m³/m³</span>
                 </div>
                 <div className="h-6 w-full rounded-full bg-black/60 border border-white/10 overflow-hidden relative">
@@ -272,9 +278,9 @@ export default function SciencePage() {
               </div>
 
               <div className="p-3.5 rounded-xl bg-black/40 border border-white/5 text-[11px] font-mono text-[#A8BFDC] space-y-1">
-                <div className="text-accent-cyan font-bold">HYDRAULIC STATUS: DESICCATED</div>
-                <div>Top 0-10cm: 0.082 m³/m³ (Wilting point)</div>
-                <div>Root 10-100cm: 0.142 m³/m³ (Severe stress)</div>
+                <div className="text-accent-cyan font-bold">EXAMPLE STATUS · NOT MEASURED</div>
+                <div>Example top 0-10cm: 0.082 m³/m³</div>
+                <div>Example root 10-100cm: 0.142 m³/m³</div>
               </div>
             </div>
           </div>
@@ -290,7 +296,7 @@ export default function SciencePage() {
                   03 · VEGETATION CONDITION (NDVI)
                 </span>
                 <span className="px-2.5 py-0.5 rounded-full bg-panel-dark border border-white/10 text-[10px] font-mono text-[#A8BFDC]">
-                  MODIS MOD13A2 · 1km · 16-Day
+                  Candidate: MODIS MOD13A2 · 1km · 16-Day
                 </span>
               </div>
 
@@ -320,7 +326,7 @@ export default function SciencePage() {
 
                 <div className="p-4 rounded-2xl bg-[#121929] border border-[rgba(168,191,220,0.14)]">
                   <span className="text-[10px] font-mono uppercase text-[#999CA0] block mb-1">
-                    {isAmharic ? "የአሁኑ NDVI ውጤት" : "BORENA CURRENT NDVI"}
+                    {isAmharic ? "የቦረና ምሳሌ NDVI" : "BORENA ILLUSTRATIVE NDVI"}
                   </span>
                   <div className="font-mono text-xl text-amber-400 font-bold">
                     0.375 (-1.65 σ)
@@ -376,8 +382,8 @@ export default function SciencePage() {
             </h2>
             <p className="text-xs sm:text-sm text-[#A8BFDC] leading-relaxed">
               {isAmharic
-                ? "እውነተኛና አደገኛ ድርቅ የሚከሰተው ዝናብ ሲቀንስ፣ የአፈር እርጥበት ሲሟጠጥ እና የዕፅዋት ሽፋን ሲደርቅ በሦስቱም በአንድ ላይ ነው። ETHIODROUGHT ይህንን የተቀናጀ አደጋ በቅጽበት ይለያል።"
-                : "A catastrophic drought emergency occurs when precipitation deficits, subterranean soil moisture depletion, and vegetation canopy collapse align simultaneously. ETHIODROUGHT synthesizes all three to deliver definitive early warnings."}
+                ? "እውነተኛና አደገኛ ድርቅ የሚከሰተው ዝናብ ሲቀንስ፣ የአፈር እርጥበት ሲሟጠጥ እና የዕፅዋት ሽፋን ሲደርቅ በሦስቱም በአንድ ላይ ነው። AETHER ይህንን ግንኙነት ለመመርመር ታስቦ ተዘጋጅቷል።"
+                : "A catastrophic drought emergency can involve precipitation deficits, soil moisture depletion, and vegetation stress together. Aether is designed to investigate those relationships; this prototype does not deliver verified live early warnings."}
             </p>
           </div>
 

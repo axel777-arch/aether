@@ -24,6 +24,8 @@ const science = loadTypeScript('src/lib/backend/science.ts');
 const ingestion = loadTypeScript('src/lib/backend/ingestion.ts');
 const catalog = loadTypeScript('src/lib/backend/catalog.ts');
 const nasaPower = loadTypeScript('src/lib/backend/nasa-power.ts');
+const zoneBoundaries = loadTypeScript('src/lib/zone-boundaries.ts');
+const aiExplainer = loadTypeScript('src/lib/aiExplainer.ts');
 
 test('dataset and source registries distinguish candidates, tools, and references from integrations', () => {
   const expectedReferences = [
@@ -91,6 +93,56 @@ test('Borena boundary is the locally stored public Ethiopia ADM2 feature', () =>
   assert.ok(boundary.geometry.coordinates[0].length > 100);
 });
 
+test('72-zone GeoJSON validator accepts the supplied boundary and rejects invalid collections', () => {
+  const boundaryPath = path.resolve(__dirname, '..', 'public/zone-data/ethiopia_zones.geojson');
+  const boundary = JSON.parse(fs.readFileSync(boundaryPath, 'utf8'));
+  assert.equal(zoneBoundaries.isEthiopiaZoneFeatureCollection(boundary), true);
+
+  const wrongCount = { ...boundary, features: boundary.features.slice(1) };
+  assert.equal(zoneBoundaries.isEthiopiaZoneFeatureCollection(wrongCount), false);
+
+  const duplicateId = JSON.parse(JSON.stringify(boundary));
+  duplicateId.features[1].properties.ID_2 = duplicateId.features[0].properties.ID_2;
+  assert.equal(zoneBoundaries.isEthiopiaZoneFeatureCollection(duplicateId), false);
+
+  const wrongCrs = { ...boundary, crs: { type: 'name', properties: { name: 'EPSG:3857' } } };
+  assert.equal(zoneBoundaries.isEthiopiaZoneFeatureCollection(wrongCrs), false);
+});
+
+test('scientific explanation distinguishes nonsignificant trends and unverified inputs', () => {
+  const explanation = aiExplainer.generateScientificExplanation({
+    regionName: 'Borena',
+    variableName: 'vegetation',
+    dateStr: '2024-11',
+    rainfallZ: -1.2,
+    soilZ: -0.8,
+    vegZ: -1.1,
+    diagnosis: {
+      title: 'Demonstration pattern',
+      titleAmharic: 'ምሳሌ',
+      phase: 'early',
+      scientificExplanation: 'Example interpretation.',
+      summary: 'Example summary.',
+      summaryAmharic: 'ምሳሌ',
+      agriculturalImplication: 'Example implication.',
+    },
+    trendResult: {
+      trend: 'decreasing',
+      significant: false,
+      sensSlope: -0.01,
+      S: -4,
+      zScore: -0.8,
+      pValue: 0.42,
+    },
+    periodLabel: 'synthetic demonstration series',
+  });
+
+  assert.match(explanation.english, /synthetic demonstration series/);
+  assert.match(explanation.english, /Inputs have not been independently verified/);
+  assert.match(explanation.english, /decreasing direction that is not statistically significant/);
+  assert.doesNotMatch(explanation.english, /statistically significant declining/);
+});
+
 test('zone overlay uses point-in-polygon assignment and excludes polygon holes', () => {
   const polygon = {
     type: 'Feature',
@@ -138,6 +190,11 @@ test('supplied zone datasets create static spatial summaries but block forecast 
   assert.equal(result.datasets.surfaceTemperature.assignedGridCells, 93);
   assert.equal(result.datasets.rainfall.spatiallyMappableToZones, false);
   assert.equal(result.datasets.rainfall.temporalCoverage.validDateCount, 9131);
+  assert.deepEqual(result.datasets.rainfall.latestObservation, {
+    date: '2025-05-31',
+    value: 0.828730941,
+  });
+  assert.ok(result.datasets.rainfall.valueRange.minimum < result.datasets.rainfall.valueRange.maximum);
   assert.equal(result.trainingReadiness.eligibleForForecastTraining, false);
   assert.ok(result.limitations.some((limitation) => limitation.includes('not month-by-month observations')));
 });
@@ -303,12 +360,16 @@ test('mock SMS provider refuses a non-sample server mode', async () => {
   process.env.SMS_MODE = 'live';
   const notifications = loadTypeScript('src/lib/backend/notifications.ts');
   const message = {
-    id: 'm1', alertId: 'a1', content: 'ETHIODROUGHT SAMPLE ALERT', templateVersion: 'sample-en-v1',
+    id: 'm1', alertId: 'a1', content: 'AETHER SAMPLE ALERT', templateVersion: 'sample-en-v1',
     createdAt: new Date().toISOString(), status: 'approved', reviewer: 'reviewer', reviewComment: null,
     reviewedAt: new Date().toISOString(), simulation: null,
   };
+  assert.match(notifications.generateSampleMessage({
+    regionId: 'borena', reference: 'SAMPLE-1', observationPeriod: 'not assessed',
+    reportReference: 'SAMPLE-REPORT-1',
+  }), /^AETHER SAMPLE ALERT/);
   await assert.rejects(() => notifications.createMockSmsProvider().dispatch(message), /sample-only/i);
-  assert.throws(() => notifications.assertSampleMessage('ETHIODROUGHT ALERT'), /SAMPLE/);
+  assert.throws(() => notifications.assertSampleMessage('AETHER ALERT'), /SAMPLE/);
   if (previous === undefined) delete process.env.SMS_MODE;
   else process.env.SMS_MODE = previous;
 });
@@ -336,6 +397,8 @@ test('email alerts use the configured recipient and stay disabled until SMTP is 
     };
     const email = emailAlerts.createSampleEmailAlert(alert);
     assert.equal(email.recipient, 'ezraambaw@gmail.com');
+    assert.match(email.subject, /^\[AETHER SAMPLE\]/);
+    assert.match(email.text, /AETHER SAMPLE EMAIL ALERT/);
     assert.match(email.subject, /SAMPLE/);
     assert.match(email.text, /No environmental measurements were analyzed/);
     assert.throws(() => emailAlerts.getEmailTransportConfig(), /disabled/i);

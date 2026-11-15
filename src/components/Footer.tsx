@@ -19,9 +19,9 @@ export const Footer: React.FC = () => {
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-xl overflow-hidden bg-panel-dark border border-accent-cyan/40 shadow-[0_0_15px_rgba(40,215,197,0.3)] shrink-0">
                 <img
-                  src="/logo.jpg"
-                  alt="ETHIODROUGHT Logo"
-                  className="w-full h-full object-cover"
+                  src="/aether-logo.png"
+                  alt="Aether logo"
+                  className="w-full h-full object-contain p-0.5"
                 />
               </div>
               <span className="font-heading font-bold text-text-primary tracking-wider text-base">
@@ -46,7 +46,7 @@ export const Footer: React.FC = () => {
               <Link href="/trends" className="text-text-subtle hover:text-accent-cyan transition-colors">Trend Detective</Link>
               <Link href="/predict" className="text-text-subtle hover:text-accent-cyan transition-colors">Experimental Predictor</Link>
               <Link href="/compare" className="text-text-subtle hover:text-accent-cyan transition-colors">Regional Comparison</Link>
-              <Link href="/alerts" className="text-text-subtle hover:text-accent-cyan transition-colors">ETHIODROUGHT Alert</Link>
+              <Link href="/alerts" className="text-text-subtle hover:text-accent-cyan transition-colors">Aether Alert</Link>
               <Link href="/datasets" className="text-text-subtle hover:text-accent-cyan transition-colors">Dataset Explorer</Link>
             </nav>
           </div>
@@ -88,7 +88,7 @@ export const Footer: React.FC = () => {
 
         {/* Bottom Bar */}
         <div className="mt-8 pt-4 border-t border-panel-border/15 flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] font-mono text-text-subtle">
-          <span>ETHIODROUGHT — Beyond Rainfall | 2026 NASA Space Apps Challenge</span>
+          <span>Aether — Beyond Rainfall | 2026 NASA Space Apps Challenge</span>
           <span>Ethiopia | Borena Zone Case Study | Open Science</span>
         </div>
       </div>

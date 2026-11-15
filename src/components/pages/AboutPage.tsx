@@ -107,7 +107,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ lang }) => {
             </li>
           </ul>
           <p>
-            By combining NASA satellite measurements of rainfall (GPM IMERG), root-zone soil moisture (FLDAS Noah), and canopy health (MODIS NDVI) into the <strong>Drought Fingerprint Engine</strong>, ETHIODROUGHT equips pastoralists, agricultural extension workers, and humanitarian agencies with earlier and more credible diagnostic intelligence.
+            By combining NASA satellite measurements of rainfall (GPM IMERG), root-zone soil moisture (FLDAS Noah), and canopy health (MODIS NDVI) into the <strong>Drought Fingerprint Engine</strong>, Aether aims to provide pastoralists, agricultural extension workers, and humanitarian agencies with earlier and more credible diagnostic intelligence.
           </p>
         </div>
       </div>
@@ -141,7 +141,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ lang }) => {
             <span>Scientific Integrity & Open Source Ethos</span>
           </div>
           <p className="text-xs text-text-secondary leading-relaxed">
-            ETHIODROUGHT was conceived for the 2026 NASA Space Apps Challenge under the category <em>"Be An Earth System Trend Detective!"</em>. 
+            Aether was conceived for the 2026 NASA Space Apps Challenge under the category <em>"Be An Earth System Trend Detective!"</em>.
             All satellite archives are traceable to official NASA Earthdata portals (FLDAS, GPM, MODIS). 
             No measurements are fabricated, and demonstration values are transparently demarcated.
           </p>
