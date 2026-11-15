@@ -1,0 +1,762 @@
+<title>Drought Investigation Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Michroma&display=swap">
+<style>
+/* Layout: ETHIODROUGHT top bar, then a three-column workbench: setup | map + time views | findings.
+   Single dark look by choice: it matches the existing ETHIODROUGHT identity. */
+:root{
+  --bg:#040507; --bg2:#070A10; --panel:#0A0E16; --panel2:#0E1420; --line:#18202F; --line2:#253352;
+  --fg:#E7EDF5; --mut:#93A1B8; --dim:#5D6C85;
+  --acc:#28D7C5; --acc-soft:rgba(40,215,197,.10); --acc-line:rgba(40,215,197,.38);
+  --navy:#253352; --blue:#41619F; --lblue:#A8BFDC;
+  --c-wet:#41619F; --c-norm:#1C5F5C; --c-watch:#E3C84F; --c-mod:#F0A04B; --c-sev:#E8664D; --c-ext:#C2335A; --c-nodata:#121826;
+  --s-p:#7FA6E8; --s-s:#28D7C5; --s-n:#A6D96A;
+  --font-d:'Michroma','Eurostile','Arial Black',sans-serif;
+  --font-b:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-m:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:auto}
+body{
+  background-color:var(--bg);
+  background-image:radial-gradient(900px 520px at 8% -6%,rgba(40,215,197,.10),transparent 60%),radial-gradient(800px 600px at 100% 0%,rgba(37,51,82,.35),transparent 60%);
+  background-repeat:no-repeat;
+  color:var(--fg); font:14px/1.5 var(--font-b); margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); padding-block:0 40px;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.mono{font-family:var(--font-m)}
+.lab{font:500 10.5px/1.2 var(--font-m);letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.wrap{max-width:1560px;margin:0 auto}
+
+/* top bar */
+.top{display:flex;align-items:center;gap:18px;padding:16px 0;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.mark{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--acc);display:grid;place-items:center;box-shadow:0 0 18px rgba(40,215,197,.25);flex:none}
+.brand b{display:block;font:400 19px/1.1 var(--font-d);letter-spacing:.01em}
+.brand span{display:block;margin-top:5px;font:500 10px/1 var(--font-m);letter-spacing:.34em;color:var(--mut)}
+.nav{display:flex;gap:4px;padding:5px;border:1px solid var(--line);border-radius:999px;background:rgba(10,14,22,.7);overflow-x:auto;max-width:100%}
+.nav span{font:400 12px/1 var(--font-m);letter-spacing:.18em;padding:11px 16px;border-radius:999px;color:var(--dim);white-space:nowrap}
+.nav span.on{color:var(--fg);border:1.5px solid var(--acc);box-shadow:0 0 14px rgba(40,215,197,.2) inset}
+
+/* hero */
+.hero{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;padding:18px 0 16px}
+.hero h1{margin:0;font:400 clamp(20px,3.2vw,32px)/1.15 var(--font-d);letter-spacing:.01em;text-wrap:balance}
+.hero p{margin:10px 0 0;max-width:68ch;color:var(--mut)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border:1px solid var(--line2);border-radius:999px;font:500 10.5px/1 var(--font-m);letter-spacing:.1em;text-transform:uppercase;color:var(--mut);background:rgba(14,20,32,.7)}
+.chip i{width:7px;height:7px;border-radius:50%;background:var(--acc)}
+.chip.warn{color:#F2C879;border-color:rgba(240,160,75,.5)} .chip.warn i{background:var(--c-mod)}
+
+.banner{display:flex;gap:12px;align-items:flex-start;border:1px solid rgba(240,160,75,.45);background:rgba(240,160,75,.07);border-radius:14px;padding:11px 14px;margin-bottom:16px;color:#F2D3A6;font-size:13px}
+.banner b{font:500 10.5px/1.6 var(--font-m);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;color:var(--c-mod)}
+
+/* workbench */
+.bench{display:grid;grid-template-columns:304px minmax(0,1fr) 352px;gap:16px;align-items:start}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.card{background:linear-gradient(180deg,rgba(14,20,32,.92),rgba(10,14,22,.92));border:1px solid var(--line);border-radius:20px;padding:16px;min-width:0}
+.card.map{padding:0;overflow:hidden;border-radius:24px;border-color:var(--line2)}
+.card h2{margin:0 0 12px;font:400 12px/1.3 var(--font-d);letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card h2 small{font:500 10px/1 var(--font-m);letter-spacing:.14em;color:var(--dim);text-transform:uppercase}
+details.grp{border:1px solid var(--line);border-radius:16px;background:rgba(10,14,22,.8)}
+details.grp>summary{list-style:none;cursor:pointer;padding:13px 14px;display:flex;justify-content:space-between;align-items:center;font:400 11.5px/1 var(--font-d);letter-spacing:.06em}
+details.grp>summary::-webkit-details-marker{display:none}
+details.grp>summary::after{content:"+";font:400 16px/1 var(--font-m);color:var(--acc)}
+details.grp[open]>summary::after{content:"–"}
+details.grp .in{padding:2px 14px 14px;display:flex;flex-direction:column;gap:12px}
+.fld{display:flex;flex-direction:column;gap:6px;min-width:0}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row4{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+input[type=number],input[type=text],select{width:100%;background:var(--bg);border:1px solid var(--line2);border-radius:10px;padding:8px 10px;font:400 12.5px/1.2 var(--font-m);min-width:0}
+select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--mut) 50%),linear-gradient(135deg,var(--mut) 50%,transparent 50%);background-position:calc(100% - 15px) 50%,calc(100% - 10px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:26px}
+input[type=range]{width:100%;accent-color:var(--acc)}
+.btn{background:transparent;border:1px solid var(--line2);border-radius:999px;padding:8px 14px;font:500 11px/1 var(--font-m);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;color:var(--fg);white-space:nowrap}
+.btn:hover{border-color:var(--acc-line);background:var(--acc-soft)}
+.btn.pri{border-color:var(--acc);box-shadow:0 0 14px rgba(40,215,197,.18) inset}
+.btn.sm{padding:6px 10px;font-size:10px}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.chk{display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13px}
+.chk input{accent-color:var(--acc);width:15px;height:15px;margin:0}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.hint{font-size:12px;color:var(--mut);line-height:1.5}
+.drop{border:1px dashed var(--line2);border-radius:12px;padding:12px;text-align:center;color:var(--mut);font-size:12px;cursor:pointer}
+.drop.over{border-color:var(--acc);background:var(--acc-soft)}
+pre.code{margin:0;padding:10px;background:var(--bg);border:1px solid var(--line);border-radius:10px;font:400 11px/1.5 var(--font-m);color:var(--lblue);overflow-x:auto}
+.err{color:#F28B82;font-size:12px}
+
+/* map */
+.mapbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line)}
+.mapbar .big{font:400 15px/1 var(--font-d);letter-spacing:.04em;margin-top:6px}
+.mapstage{position:relative;aspect-ratio:16/12.5;background:#05070B}
+.mapstage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:crosshair;touch-action:manipulation}
+.tip{position:absolute;pointer-events:none;background:rgba(4,5,7,.92);border:1px solid var(--line2);border-radius:10px;padding:8px 10px;font:400 11px/1.5 var(--font-m);color:var(--fg);z-index:3;white-space:nowrap}
+.legend{position:absolute;right:12px;top:12px;background:rgba(4,5,7,.85);border:1px solid var(--line2);border-radius:14px;padding:10px 12px;z-index:2;max-width:calc(100% - 24px)}
+.legend .bar{display:flex;gap:2px;margin-top:8px}
+.legend .bar span{display:block;flex:1;min-width:30px;height:7px;border-radius:2px}
+.legend .tx{display:flex;gap:2px;margin-top:5px}
+.legend .tx span{flex:1;min-width:30px;font:400 9px/1.1 var(--font-m);color:var(--mut);text-align:center}
+.scrub{display:flex;align-items:center;gap:12px;padding:12px 16px;border-top:1px solid var(--line)}
+.scrub input{flex:1}
+.tabs{display:inline-flex;border:1px solid var(--line2);border-radius:999px;padding:3px;gap:2px}
+.tabs button{background:none;border:0;border-radius:999px;padding:6px 12px;font:500 10.5px/1 var(--font-m);letter-spacing:.1em;text-transform:uppercase;color:var(--mut);cursor:pointer}
+.tabs button[aria-selected=true]{background:var(--acc);color:#031412}
+.zc{touch-action:pan-y;cursor:col-resize;overflow:hidden}
+.zc svg{display:block;max-width:100%}
+.leg{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:8px;font:400 11px/1 var(--font-m);color:var(--mut)}
+.leg span{display:inline-flex;align-items:center;gap:6px}
+.leg i{width:14px;height:3px;border-radius:2px;display:block}
+.read{font:400 11.5px/1.5 var(--font-m);color:var(--mut);margin-top:8px;min-height:18px}
+
+/* findings */
+.verdict{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.pill{font:400 14px/1 var(--font-d);padding:11px 14px;border-radius:12px;border:1px solid;letter-spacing:.04em}
+.bigz{font:400 30px/1 var(--font-d)}
+.bigz small{display:block;font:500 10px/1 var(--font-m);letter-spacing:.16em;color:var(--dim);margin-top:7px;text-transform:uppercase}
+table.t{width:100%;border-collapse:collapse;font-size:12.5px}
+table.t th{font:500 10px/1 var(--font-m);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);text-align:right;padding:0 0 8px}
+table.t th:first-child,table.t td:first-child{text-align:left}
+table.t td{padding:8px 0;border-top:1px solid var(--line);text-align:right;font-family:var(--font-m);font-variant-numeric:tabular-nums;font-size:12px}
+table.t td:first-child{font-family:var(--font-b);font-size:12.5px}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.kv div{border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:rgba(7,10,16,.7)}
+.kv b{display:block;font:400 15px/1.2 var(--font-d);margin-top:7px}
+.kv small{display:block;color:var(--mut);font-size:11.5px;margin-top:5px;line-height:1.4}
+.ev{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+.ev li{display:grid;grid-template-columns:20px 1fr;gap:8px;font-size:12.5px;line-height:1.45;color:var(--mut)}
+.ev li b{font:500 11px/1.6 var(--font-m)}
+.ev .ok b{color:var(--acc)} .ev .wn b{color:var(--c-mod)} .ev .no b{color:var(--c-ext)}
+.ev li span strong{color:var(--fg);font-weight:500}
+.ll{display:grid;grid-template-columns:96px 1fr;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:12px}
+.ll:first-of-type{border-top:0}
+.bars{display:flex;gap:4px;align-items:flex-end;height:46px}
+.bars div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;height:100%}
+.bars i{display:block;width:100%;border-radius:2px;background:var(--blue);min-height:2px}
+.bars i.best{background:var(--acc)}
+.bars em{font:400 9px/1 var(--font-m);color:var(--dim);font-style:normal}
+textarea.sum{width:100%;min-height:210px;resize:vertical;background:var(--bg);border:1px solid var(--line2);border-radius:12px;padding:12px;font:400 11.5px/1.55 var(--font-m);color:var(--lblue)}
+.meth h3{margin:14px 0 4px;font:500 11px/1.3 var(--font-m);letter-spacing:.12em;text-transform:uppercase;color:var(--lblue)}
+.meth p,.meth li{color:var(--mut);font-size:12.5px;line-height:1.55;margin:0 0 6px}
+.meth ul{padding-left:18px;margin:0}
+.empty{border:1px dashed var(--line2);border-radius:16px;padding:28px 18px;text-align:center;color:var(--mut)}
+.empty b{display:block;font:400 13px/1.3 var(--font-d);color:var(--fg);margin-bottom:8px}
+.pinrow{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:12px}
+.pinrow:first-child{border-top:0}
+.pinrow code{font:400 11px/1.3 var(--font-m);color:var(--mut)}
+.x{background:none;border:0;color:var(--dim);cursor:pointer;font-size:16px;line-height:1}
+.x:hover{color:var(--fg)}
+footer.note{margin-top:22px;color:var(--dim);font:400 11px/1.6 var(--font-m);max-width:110ch}
+
+@media (max-width:1240px){.bench{grid-template-columns:minmax(0,1fr)}.col.left{order:2}.col.mid{order:1}.col.right{order:3}.left .grp-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}}
+@media (max-width:560px){.top{gap:10px}.nav span{padding:9px 11px;font-size:11px}.row4{grid-template-columns:repeat(2,1fr)}.mapbar .big{font-size:13px}.kv{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:no-preference){.pill,.bigz{transition:color .2s,border-color .2s,background .2s}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="mark" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#28D7C5" stroke-width="1.6"><circle cx="12" cy="12" r="8.5"/><path d="M6 13c2.5-3 5-3 6-1s3.5 2 6-1"/><circle cx="12" cy="12" r="2" fill="#28D7C5" stroke="none"/></svg></div>
+      <div><b>ETHIODROUGHT</b><span>BEYOND RAINFALL · 2026</span></div>
+    </div>
+    <nav class="nav" aria-label="Main sections (prototype)">
+      <span>HOME</span><span>STORY</span><span>SIGNALS</span><span>REGIONS</span><span>REPORTS</span><span class="on" aria-current="page">LAB</span>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div>
+      <div class="lab" style="margin-bottom:10px">Investigation environment</div>
+      <h1>DROUGHT INVESTIGATION LAB</h1>
+      <p>Pick a place, choose the signals, set the baseline, then see how rainfall, root-zone soil moisture and vegetation depart from normal, how long it has lasted, and whether the signals agree.</p>
+    </div>
+    <div class="chips" id="chips"></div>
+  </section>
+
+  <div class="banner" id="banner" hidden></div>
+
+  <div class="bench">
+    <!-- SETUP -->
+    <aside class="col left"><div class="grp-wrap" style="display:flex;flex-direction:column;gap:16px">
+      <details class="grp" open>
+        <summary>1 · DATA</summary>
+        <div class="in">
+          <div id="dsStatus" class="hint"></div>
+          <div class="btns">
+            <button class="btn sm pri" id="btnSynth" type="button">Synthetic demo</button>
+            <button class="btn sm" id="btnClear" type="button">Clear</button>
+          </div>
+          <label class="drop" id="drop" for="fileIn">Drop a CSV or JSON file here, or click to choose<input id="fileIn" type="file" accept=".csv,.json,.txt" hidden></label>
+          <div id="loadErr" class="err" role="alert"></div>
+          <details><summary class="lab" style="cursor:pointer">Expected columns</summary>
+            <pre class="code" style="margin-top:8px">date,lat,lon,precip,soil,ndvi
+2025-03-01,4.75,38.25,41.2,0.118,0.31
+2025-03-01,5.25,38.25,38.9,0.121,0.33</pre>
+            <p class="hint" style="margin:8px 0 0">One row per observation. Any time step works; the Lab averages to months. Signals you do not have can be left out. Without lat/lon the file is treated as one regional series.</p>
+          </details>
+        </div>
+      </details>
+
+      <details class="grp" open>
+        <summary>2 · LOCATION</summary>
+        <div class="in">
+          <div class="fld"><label class="lab" for="preset">Preset</label>
+            <select id="preset"></select></div>
+          <div class="row2">
+            <div class="fld"><label class="lab" for="lat">Latitude °N</label><input id="lat" type="number" step="0.01" min="3" max="15.5"></div>
+            <div class="fld"><label class="lab" for="lon">Longitude °E</label><input id="lon" type="number" step="0.01" min="32.5" max="48.5"></div>
+          </div>
+          <div class="fld"><label class="lab" for="rad">Radius · <span id="radV"></span> km</label><input id="rad" type="range" min="25" max="600" step="25"></div>
+          <p class="hint" style="margin:0">Click the map to move the centre. All data cells inside the circle are averaged.</p>
+          <div class="btns"><button class="btn sm" id="btnPin" type="button">Pin for comparison</button></div>
+        </div>
+      </details>
+
+      <details class="grp" open>
+        <summary>3 · SIGNALS</summary>
+        <div class="in">
+          <label class="chk"><input type="checkbox" id="sigP" checked><i class="dot" style="background:var(--s-p)"></i>Precipitation</label>
+          <label class="chk"><input type="checkbox" id="sigS" checked><i class="dot" style="background:var(--s-s)"></i>Root-zone soil moisture</label>
+          <label class="chk"><input type="checkbox" id="sigN" checked><i class="dot" style="background:var(--s-n)"></i>Vegetation (NDVI)</label>
+          <div class="fld"><label class="lab" for="layer">Map layer</label>
+            <select id="layer"><option value="comp">Composite anomaly</option><option value="p">Precipitation anomaly</option><option value="s">Soil moisture anomaly</option><option value="n">Vegetation anomaly</option></select></div>
+        </div>
+      </details>
+
+      <details class="grp" open>
+        <summary>4 · BASELINE &amp; THRESHOLDS</summary>
+        <div class="in">
+          <div class="row2">
+            <div class="fld"><label class="lab" for="bY0">Baseline from</label><input id="bY0" type="number" step="1"></div>
+            <div class="fld"><label class="lab" for="bY1">to (year)</label><input id="bY1" type="number" step="1"></div>
+          </div>
+          <div class="fld"><span class="lab">Class limits · anomaly σ</span>
+            <div class="row4">
+              <input id="th0" type="number" step="0.1" max="0" aria-label="Watch limit">
+              <input id="th1" type="number" step="0.1" max="0" aria-label="Moderate limit">
+              <input id="th2" type="number" step="0.1" max="0" aria-label="Severe limit">
+              <input id="th3" type="number" step="0.1" max="0" aria-label="Extreme limit">
+            </div>
+            <div class="hint" style="font-size:11px">Order: Watch, Moderate / Severe, Extreme</div>
+          </div>
+          <div class="row2">
+            <div class="fld"><label class="lab" for="win">Trend window</label><select id="win"><option value="12">12 months</option><option value="24" selected>24 months</option><option value="36">36 months</option><option value="60">60 months</option></select></div>
+            <div class="fld"><label class="lab" for="range">Chart range</label><select id="range"><option value="60">5 years</option><option value="120" selected>10 years</option><option value="0">Full record</option></select></div>
+          </div>
+          <div class="btns"><button class="btn sm" id="btnTh" type="button">Reset limits</button></div>
+        </div>
+      </details>
+    </div></aside>
+
+    <!-- MAP + TIME VIEWS -->
+    <section class="col mid">
+      <div class="card map">
+        <div class="mapbar">
+          <div><div class="lab">Selected month</div><div class="big" id="mapMonth">—</div></div>
+          <div class="lab" id="mapLayerName"></div>
+        </div>
+        <div class="mapstage" id="stage">
+          <canvas id="map" aria-label="Map of Ethiopia with data cells coloured by anomaly. Click to choose a location."></canvas>
+          <div class="legend" id="legend"></div>
+          <div class="tip" id="tip" hidden></div>
+        </div>
+        <div class="scrub">
+          <button class="btn sm pri" id="btnPlay" type="button" aria-label="Play through months">Play</button>
+          <input id="scrub" type="range" min="0" max="0" value="0" aria-label="Month">
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>TIME SERIES <span class="tabs" role="tablist"><button role="tab" id="tabZ" aria-selected="true" type="button">Anomaly</button><button role="tab" id="tabR" aria-selected="false" type="button">Raw vs baseline</button></span></h2>
+        <div class="leg" id="serLegend"></div>
+        <div class="zc" id="series"></div>
+      </div>
+
+      <div class="card">
+        <h2>DROUGHT FINGERPRINT <small>click a month</small></h2>
+        <p class="hint" style="margin:-4px 0 10px">Each column is one month, coloured by drought class. The pattern across rows shows which signal moved first and which followed.</p>
+        <div class="zc" id="fp"></div>
+        <div class="read" id="fpRead"></div>
+      </div>
+    </section>
+
+    <!-- FINDINGS -->
+    <aside class="col right">
+      <div class="card" id="findings"></div>
+      <div class="card"><h2>EVIDENCE CHECK</h2><ul class="ev" id="evidence"></ul></div>
+      <div class="card"><h2>WHICH SIGNAL LEADS <small>lag in months</small></h2><div id="leadlag"></div></div>
+      <div class="card"><h2>COMPARE LOCATIONS</h2>
+        <div class="leg" id="cmpLegend"></div>
+        <div class="zc" id="cmp"></div>
+        <div id="pins" style="margin-top:10px"></div>
+      </div>
+      <div class="card"><h2>INVESTIGATION SUMMARY</h2>
+        <textarea class="sum" id="summary" readonly aria-label="Investigation summary"></textarea>
+        <div class="btns" style="margin-top:10px"><button class="btn sm pri" id="btnCopy" type="button">Copy summary</button><button class="btn sm" id="btnCopyJ" type="button">Copy settings JSON</button><span class="hint" id="copyMsg" style="align-self:center"></span></div>
+      </div>
+      <details class="grp"><summary>METHODS &amp; LIMITS</summary><div class="in meth" id="methods"></div></details>
+    </aside>
+  </div>
+
+  <footer class="note">Prototype built outside the main ETHIODROUGHT codebase. The data adapter (ingest) is the only place that touches observations, so the engine, charts and map can be mounted on the app's real pipeline unchanged.</footer>
+</div>
+
+<script>
+(function(){
+'use strict';
+/* ============================== CONSTANTS ============================== */
+const $=s=>document.querySelector(s);
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const SIG=[
+  {k:'p',label:'Precipitation',short:'Precip',unit:'mm',color:'#7FA6E8',dec:1},
+  {k:'s',label:'Root-zone soil moisture',short:'Soil',unit:'m³/m³',color:'#28D7C5',dec:3},
+  {k:'n',label:'Vegetation (NDVI)',short:'NDVI',unit:'',color:'#A6D96A',dec:3}
+];
+const CLS=['Normal','Watch','Moderate','Severe','Extreme'];
+const CCOL={'-1':'#41619F','0':'#1C5F5C','1':'#E3C84F','2':'#F0A04B','3':'#E8664D','4':'#C2335A','x':'#121826'};
+const TH_DEF=[-0.5,-1.0,-1.5,-2.0];
+const EXT={lon0:32.5,lon1:48.5,lat0:3.0,lat1:15.5};
+const PRESETS=[
+  {n:'Borena · station position shown in app',lat:4.533,lon:38.30,r:100},
+  {n:'Afar lowlands (approx.)',lat:11.5,lon:41.0,r:150},
+  {n:'Tigray highlands (approx.)',lat:13.5,lon:39.5,r:100},
+  {n:'Somali region · Gode (approx.)',lat:5.95,lon:43.55,r:150},
+  {n:'Southwest highlands (approx.)',lat:7.5,lon:36.5,r:150}
+];
+const PINCOL=['#B79CFF','#7FA6E8','#F2F2F2'];
+/* Schematic national outline (lon,lat), simplified for orientation only, not a survey boundary. */
+const OUT=[[36.5,14.3],[37.9,14.9],[39.5,14.5],[40.2,14.2],[41.0,13.6],[42.0,13.0],[42.4,12.4],[41.9,11.8],[42.2,11.2],[42.7,10.9],[43.0,9.6],[44.0,9.0],[45.8,8.4],[47.9,8.0],[46.5,7.0],[44.9,5.9],[43.3,4.7],[41.9,3.98],[41.0,3.95],[39.9,3.9],[39.05,3.52],[38.0,3.6],[37.1,4.3],[36.0,4.45],[35.0,5.5],[34.2,7.0],[34.0,8.0],[33.0,8.4],[34.1,9.5],[34.3,10.5],[35.0,11.5],[35.8,12.7]];
+
+/* ============================== STATE ============================== */
+const S={src:null,cells:[],hasGeo:false,cs:0.5,m0:0,nM:0,cur:0,
+  sel:{lat:4.533,lon:38.30,r:100},signals:{p:true,s:true,n:true},layer:'comp',
+  base:{y0:2010,y1:2023},th:TH_DEF.slice(),win:24,range:120,mode:'z',pins:[],cz:[],A:null,ref:null,pinA:[],playing:false,timer:null};
+
+/* ============================== HELPERS ============================== */
+const fz=x=>x===x&&isFinite(x)?(x>0?'+':'')+x.toFixed(2).replace('-','−'):'—';
+const fv=(x,d)=>x===x&&isFinite(x)?x.toFixed(d):'—';
+const mlabel=i=>{const k=S.m0+i;return MON[((k%12)+12)%12]+' '+Math.floor(k/12)};
+const yearOf=i=>Math.floor((S.m0+i)/12);
+const calm=i=>((S.m0+i)%12+12)%12;
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const hav=(a,b,c,d)=>{const R=6371,t=Math.PI/180,dl=(c-a)*t,dn=(d-b)*t;const h=Math.sin(dl/2)**2+Math.cos(a*t)*Math.cos(c*t)*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function cls(z){if(!(z===z))return 'x';const t=S.th;if(z<=t[3])return 4;if(z<=t[2])return 3;if(z<=t[1])return 2;if(z<=t[0])return 1;if(z>=-t[0])return -1;return 0}
+const clsName=c=>c==='x'?'No data':c===-1?'Above normal':CLS[c];
+const incl=()=>SIG.filter(s=>S.signals[s.k]);
+function normCdf(x){const t=1/(1+0.2316419*Math.abs(x)),d=0.3989423*Math.exp(-x*x/2);let p=d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return x>0?1-p:p}
+
+/* ============================== DATA ADAPTER ==============================
+   ingest(rows, meta): rows = [{t, lat, lon, p, s, n}] (t = date string/ms/Date; signals numeric or NaN).
+   This is the only function that touches observations. In the main app, call it with the pipeline output. */
+function ingest(rows,meta){
+  let k0=1e9,k1=-1e9;const pts=[];
+  for(const r of rows){const d=new Date(r.t);if(isNaN(d))continue;const k=d.getUTCFullYear()*12+d.getUTCMonth();if(k<k0)k0=k;if(k>k1)k1=k;pts.push([k,r])}
+  if(!pts.length)throw new Error('No rows with a readable date.');
+  const nM=k1-k0+1;if(nM>1200)throw new Error('Record spans more than 100 years.');
+  const map=new Map();
+  for(const [k,r] of pts){
+    const geo=typeof r.lat==='number'&&typeof r.lon==='number'&&isFinite(r.lat)&&isFinite(r.lon);
+    const key=geo?r.lat+'|'+r.lon:'nogeo';let c=map.get(key);
+    if(!c){c={lat:geo?r.lat:NaN,lon:geo?r.lon:NaN,sum:{},cnt:{}};for(const s of SIG){c.sum[s.k]=new Float64Array(nM);c.cnt[s.k]=new Uint16Array(nM)}map.set(key,c)}
+    for(const s of SIG){const v=r[s.k];if(typeof v==='number'&&isFinite(v)){c.sum[s.k][k-k0]+=v;c.cnt[s.k][k-k0]++}}
+  }
+  const cells=[];
+  for(const c of map.values()){c.v={};for(const s of SIG){const a=new Float32Array(nM);for(let i=0;i<nM;i++)a[i]=c.cnt[s.k][i]?c.sum[s.k][i]/c.cnt[s.k][i]:NaN;c.v[s.k]=a}delete c.sum;delete c.cnt;cells.push(c)}
+  const has={};SIG.forEach(s=>has[s.k]=cells.some(c=>c.v[s.k].some(v=>v===v)));
+  if(!SIG.some(s=>has[s.k]))throw new Error('No numeric signal columns found (expected precip, soil, ndvi).');
+  S.cells=cells;S.hasGeo=cells.every(c=>isFinite(c.lat));S.m0=k0;S.nM=nM;S.src=Object.assign({has},meta);
+  if(S.hasGeo){const lo=[...new Set(cells.map(c=>c.lon))].sort((a,b)=>a-b),la=[...new Set(cells.map(c=>c.lat))].sort((a,b)=>a-b);let m=1e9;for(const a of [lo,la])for(let i=1;i<a.length;i++){const d=a[i]-a[i-1];if(d>1e-6&&d<m)m=d}S.cs=m<1e9?clamp(m,0.05,2):0.5}
+  SIG.forEach(s=>{if(!has[s.k])S.signals[s.k]=false});
+  const fy=Math.floor(k0/12),ly=Math.floor(k1/12);S.base={y0:fy,y1:Math.max(fy,ly-3)};
+  S.cur=nM-1;S.pins=[];
+}
+/* column mapper for CSV/JSON */
+function mapKeys(keys){const m={};const tests=[['t',/^(date|time|timestamp|month|datetime|t)$/i],['lat',/^lat/i],['lon',/^(lon|lng|long)/i],['p',/precip|rain|chirps|imerg|^p$/i],['s',/soil|rzsm|moist|^s$/i],['n',/ndvi|veg|evi|^n$/i]];
+  for(const [k,re] of tests){const f=keys.find(x=>!Object.values(m).includes(x)&&re.test(String(x).trim()));if(f!==undefined)m[k]=f}return m}
+function rowsFromObjs(objs){
+  if(!objs.length)throw new Error('The file has no rows.');
+  const m=mapKeys(Object.keys(objs[0]));if(!m.t)throw new Error('No date column found. Name it "date".');
+  const num=v=>{if(v===null||v===undefined||v==='')return NaN;const x=Number(v);return isFinite(x)?x:NaN};
+  return objs.map(o=>({t:o[m.t],lat:num(o[m.lat]),lon:num(o[m.lon]),p:num(o[m.p]),s:num(o[m.s]),n:num(o[m.n])}));
+}
+function parseCSV(t){const rows=[];let row=[],cur='',q=false;for(let i=0;i<t.length;i++){const ch=t[i];if(q){if(ch==='"'){if(t[i+1]==='"'){cur+='"';i++}else q=false}else cur+=ch}else if(ch==='"')q=true;else if(ch===','){row.push(cur);cur=''}else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&t[i+1]==='\n')i++;row.push(cur);cur='';if(row.length>1||row[0]!=='')rows.push(row);row=[]}else cur+=ch}if(cur!==''||row.length){row.push(cur);rows.push(row)}return rows}
+function loadText(name,text){
+  const err=$('#loadErr');err.textContent='';
+  try{
+    let objs;const tr=text.trim();
+    if(tr[0]==='['||tr[0]==='{'){const j=JSON.parse(tr);objs=Array.isArray(j)?j:(j.records||j.data||[])}
+    else{const rows=parseCSV(tr);const h=rows[0].map(x=>x.trim());objs=rows.slice(1).map(r=>{const o={};h.forEach((k,i)=>o[k]=r[i]);return o})}
+    ingest(rowsFromObjs(objs),{kind:'file',name});
+    S.pins=[];afterLoad();
+  }catch(e){err.textContent='Could not load '+name+': '+e.message}
+}
+
+/* ============================== SYNTHETIC DEMO DATA ============================== */
+function inPoly(lon,lat){let c=false;for(let i=0,j=OUT.length-1;i<OUT.length;j=i++){const a=OUT[i],b=OUT[j];if((a[1]>lat)!==(b[1]>lat)&&lon<(b[0]-a[0])*(lat-a[1])/(b[1]-a[1])+a[0])c=!c}return c}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function makeSynthetic(){
+  const rnd=mulberry32(20261115);const g=()=>{let u=0,v=0;while(!u)u=rnd();while(!v)v=rnd();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)};
+  const startK=2010*12,endK=2026*12+9,nM=endK-startK+1;
+  const gS=[],gN=[];let a=0,b=0;
+  for(let i=0;i<nM;i++){a=0.55*a+0.84*g();b=0.55*b+0.84*g();let s=a,n=b;const k=startK+i;
+    if(k>=2015*12+9&&k<=2016*12+8)s-=1.3;
+    if(k>=2019*12+9&&k<=2020*12+2)s+=1.2;
+    if(k>=2025*12+9){const t=Math.min(1,(k-(2025*12+9))/6);s-=1.7*t;n-=0.1*t}
+    gS.push(s);gN.push(n)}
+  const bump=(m,c,w)=>{let d=Math.abs(m-c);d=Math.min(d,12-d);return Math.exp(-0.5*(d/w)**2)};
+  const rows=[];
+  for(let la=3.25;la<15;la+=0.5)for(let lo=33.25;lo<48.5;lo+=0.5){
+    if(!inPoly(lo,la))continue;
+    const w=clamp((la-6.5)/4,0,1),off=0.25*g();let ema=1,e2=0.5;
+    const seas=m=>(1-w)*(18+95*bump(m,3.4,1.1)+70*bump(m,9.8,1.0))+w*(14+230*bump(m,6.6,1.5));
+    let tot=0;for(let m=0;m<12;m++)tot+=seas(m);const mean=tot/12;
+    for(let i=0;i<nM;i++){
+      const m=(startK+i)%12,fld=(1-w)*gS[i]+w*gN[i]+off+0.45*g();
+      const p=Math.max(0,seas(m)*Math.exp(0.30*fld+0.12*g()));
+      ema=0.62*ema+0.38*(p/mean);const soil=0.10+0.11*ema+0.004*g();
+      e2=0.6*e2+0.4*((soil-0.10)/0.11);const ndvi=clamp(0.16+0.26*e2+0.01*g(),0.05,0.9);
+      const y=Math.floor((startK+i)/12);
+      rows.push({t:y+'-'+String(m+1).padStart(2,'0')+'-15',lat:la,lon:lo,p:p,s:soil,n:ndvi});
+    }
+  }
+  return rows;
+}
+function loadSynthetic(){ingest(makeSynthetic(),{kind:'synthetic',name:'Synthetic demo'});afterLoad()}
+
+/* ============================== ANALYSIS ENGINE ============================== */
+function climOf(x){
+  const n=new Array(12).fill(0),mu=new Array(12).fill(0),m2=new Array(12).fill(0);
+  for(let i=0;i<S.nM;i++){const y=yearOf(i);if(y<S.base.y0||y>S.base.y1)continue;const v=x[i];if(!(v===v))continue;const c=calm(i);n[c]++;const d=v-mu[c];mu[c]+=d/n[c];m2[c]+=d*(v-mu[c])}
+  const sd=n.map((k,c)=>k>1?Math.sqrt(m2[c]/(k-1)):NaN);return{n,mu,sd};
+}
+function zOf(x,cl){const z=new Float32Array(S.nM);for(let i=0;i<S.nM;i++){const c=calm(i),v=x[i];z[i]=(v===v&&cl.n[c]>=5&&cl.sd[c]>1e-9)?(v-cl.mu[c])/cl.sd[c]:NaN}return z}
+function compOf(zs){const out=new Float32Array(S.nM);const ss=incl();for(let i=0;i<S.nM;i++){let t=0,n=0;for(const s of ss){const v=zs[s.k][i];if(v===v){t+=v;n++}}out[i]=n?t/n:NaN}return out}
+function pickCells(spec){
+  if(spec.all||!S.hasGeo)return{ids:S.cells.map((_,i)=>i),nearest:false,nogeo:!S.hasGeo&&!spec.all};
+  const ids=[];let best=-1,bd=1e9;
+  S.cells.forEach((c,i)=>{const d=hav(spec.lat,spec.lon,c.lat,c.lon);if(d<=spec.r)ids.push(i);if(d<bd){bd=d;best=i}});
+  if(!ids.length&&best>=0&&bd<=300)return{ids:[best],nearest:true,dist:bd};
+  return{ids,nearest:false,outside:!ids.length};
+}
+function aggregate(ids){const raw={};for(const s of SIG){const a=new Float32Array(S.nM);for(let i=0;i<S.nM;i++){let sum=0,n=0;for(const id of ids){const v=S.cells[id].v[s.k][i];if(v===v){sum+=v;n++}}a[i]=n?sum/n:NaN}raw[s.k]=a}return raw}
+function analyze(spec){
+  const pc=pickCells(spec),raw=aggregate(pc.ids),clim={},z={};
+  for(const s of SIG){clim[s.k]=climOf(raw[s.k]);z[s.k]=zOf(raw[s.k],clim[s.k])}
+  return Object.assign(pc,{raw,clim,z,comp:compOf(z)});
+}
+function computeCellZ(){S.cz=S.cells.map(c=>{const o={};for(const s of SIG)o[s.k]=zOf(c.v[s.k],climOf(c.v[s.k]));return o})}
+function mannKendall(arr,idx){
+  const v=[];for(let k=0;k<arr.length;k++)if(arr[k]===arr[k])v.push([idx[k],arr[k]]);const n=v.length;if(n<12)return null;
+  let S_=0;const sl=[];for(let i=0;i<n-1;i++)for(let j=i+1;j<n;j++){S_+=Math.sign(v[j][1]-v[i][1]);sl.push((v[j][1]-v[i][1])/(v[j][0]-v[i][0]))}
+  const vr=n*(n-1)*(2*n+5)/18,zz=S_>0?(S_-1)/Math.sqrt(vr):S_<0?(S_+1)/Math.sqrt(vr):0;
+  sl.sort((a,b)=>a-b);const sen=sl.length%2?sl[(sl.length-1)/2]:(sl[sl.length/2-1]+sl[sl.length/2])/2;
+  return{n,S:S_,p:2*(1-normCdf(Math.abs(zz))),sen:sen*12};
+}
+function pearson(a,b,lag){const xs=[],ys=[];for(let t=0;t+lag<a.length;t++){const x=a[t],y=b[t+lag];if(x===x&&y===y){xs.push(x);ys.push(y)}}const n=xs.length;if(n<24)return{r:NaN,n};const mx=xs.reduce((p,c)=>p+c,0)/n,my=ys.reduce((p,c)=>p+c,0)/n;let sxy=0,sxx=0,syy=0;for(let i=0;i<n;i++){const dx=xs[i]-mx,dy=ys[i]-my;sxy+=dx*dy;sxx+=dx*dx;syy+=dy*dy}return{r:sxx&&syy?sxy/Math.sqrt(sxx*syy):NaN,n}}
+function findings(A){
+  const i=S.cur,out={i,per:[],comp:A.comp[i]};
+  for(const s of SIG){const cl=A.clim[s.k],c=calm(i);out.per.push({s,x:A.raw[s.k][i],mu:cl.mu[c],z:A.z[s.k][i],on:S.signals[s.k]&&S.src.has[s.k]})}
+  const ss=out.per.filter(p=>p.on&&p.z===p.z);out.nz=ss.length;out.agree=ss.filter(p=>p.z<=S.th[0]).length;
+  let run=0,run2=0;for(let k=i;k>=0;k--){const v=A.comp[k];if(v===v&&v<=S.th[0])run++;else break}
+  for(let k=i;k>=0;k--){const v=A.comp[k];if(v===v&&v<=S.th[1])run2++;else break}
+  out.run=run;out.run2=run2;
+  const w=S.win,idx=[],arr=[];for(let k=Math.max(0,i-w+1);k<=i;k++){idx.push(k);arr.push(A.comp[k])}out.trend=mannKendall(arr,idx);
+  out.cov=SIG.filter(s=>S.signals[s.k]&&S.src.has[s.k]).map(s=>{let ok=0,t=0;for(let k=Math.max(0,i-w+1);k<=i;k++){t++;if(A.raw[s.k][k]===A.raw[s.k][k])ok++}return{s,f:t?ok/t:0}});
+  const by=S.base.y1-S.base.y0+1;out.baseYears=by;
+  return out;
+}
+
+/* ============================== VIEW HELPERS ============================== */
+function view(){const v1=S.nM-1,v0=S.range?Math.max(0,v1-S.range+1):0;return[v0,v1]}
+function pathOf(arr,X,Y,v0,v1){let d='',pen=false;for(let i=v0;i<=v1;i++){const v=arr[i];if(v===v){d+=(pen?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1);pen=true}else pen=false}return d}
+function xTicks(X,v0,v1,W,H,padB){
+  const span=(v1-v0)/12;const px=(W-90)/Math.max(1,span);const step=[1,2,5,10,20].find(k=>px*k>=54)||20;
+  let s='';for(let i=v0;i<=v1;i++){if(calm(i)===0){const y=yearOf(i);if(y%step===0){const x=X(i);s+=`<line x1="${x}" x2="${x}" y1="${H-padB}" y2="${H-padB+4}" style="stroke:var(--dim)"/><text x="${x}" y="${H-6}" text-anchor="middle" style="fill:var(--dim);font:400 10px var(--font-m)">${y}</text>`}}}return s}
+
+function zChart(el,lines,H,label,showTh){
+  const W=Math.max(280,Math.floor(el.clientWidth||600)),padL=40,padR=10,padT=10,padB=24;const[v0,v1]=view(),n=Math.max(1,v1-v0);
+  const X=i=>padL+(i-v0)/n*(W-padL-padR),Y=z=>padT+(3.5-clamp(z,-3.5,3.5))/7*(H-padT-padB);
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${esc(label)}">`;
+  const t=S.th;
+  [[t[0],t[1],'--c-watch'],[t[1],t[2],'--c-mod'],[t[2],t[3],'--c-sev'],[t[3],-3.5,'--c-ext']].forEach(b=>{s+=`<rect x="${padL}" y="${Y(b[0])}" width="${W-padL-padR}" height="${Y(b[1])-Y(b[0])}" style="fill:var(${b[2]});opacity:.075"/>`});
+  for(let z=-3;z<=3;z++){s+=`<line x1="${padL}" x2="${W-padR}" y1="${Y(z)}" y2="${Y(z)}" style="stroke:${z===0?'var(--line2)':'var(--line)'};stroke-width:${z===0?1.2:1}"/><text x="${padL-7}" y="${Y(z)+3.5}" text-anchor="end" style="fill:var(--dim);font:400 10px var(--font-m)">${z>0?'+':z<0?'−':''}${Math.abs(z)}</text>`}
+  if(showTh)t.forEach((v,k)=>{s+=`<line x1="${padL}" x2="${W-padR}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:var(${['--c-watch','--c-mod','--c-sev','--c-ext'][k]});stroke-dasharray:3 4;opacity:.7"/>`});
+  s+=xTicks(X,v0,v1,W,H,padB);
+  for(const L of lines){const d=pathOf(L.arr,X,Y,v0,v1);if(d)s+=`<path d="${d}" fill="none" style="stroke:${L.color};stroke-width:${L.w||1.4};opacity:${L.o||.9}${L.dash?';stroke-dasharray:'+L.dash:''}" stroke-linejoin="round"/>`}
+  if(S.cur>=v0&&S.cur<=v1){const x=X(S.cur);s+=`<line x1="${x}" x2="${x}" y1="${padT}" y2="${H-padB}" style="stroke:var(--fg);opacity:.55"/>`;const m=lines[0];if(m&&m.arr[S.cur]===m.arr[S.cur])s+=`<circle cx="${x}" cy="${Y(m.arr[S.cur])}" r="4" style="fill:${m.color};stroke:var(--bg);stroke-width:2"/>`}
+  s+='</svg>';el.innerHTML=s;el._geo={padL,padR,W,v0,v1};
+}
+
+/* ============================== RENDER ============================== */
+const dpr=()=>Math.min(2,window.devicePixelRatio||1);
+const cv=$('#map'),ctx=cv.getContext('2d');let MW=0,MH=0;
+function sizeMap(){const r=cv.getBoundingClientRect();MW=r.width;MH=r.height;cv.width=Math.round(MW*dpr());cv.height=Math.round(MH*dpr());ctx.setTransform(dpr(),0,0,dpr(),0,0)}
+const px=lon=>(lon-EXT.lon0)/(EXT.lon1-EXT.lon0)*MW,py=lat=>(EXT.lat1-lat)/(EXT.lat1-EXT.lat0)*MH;
+function cellZ(ci,i){
+  if(S.layer!=='comp')return S.cz[ci][S.layer][i];
+  let t=0,n=0;for(const s of incl()){const v=S.cz[ci][s.k][i];if(v===v){t+=v;n++}}return n?t/n:NaN;
+}
+function drawMap(){
+  if(!MW)return;ctx.clearRect(0,0,MW,MH);
+  const g=ctx.createRadialGradient(MW*.5,MH*.5,MH*.1,MW*.5,MH*.5,MH*.85);g.addColorStop(0,'#0B111B');g.addColorStop(1,'#04060A');ctx.fillStyle=g;ctx.fillRect(0,0,MW,MH);
+  ctx.fillStyle='rgba(168,191,220,.13)';for(let lo=Math.ceil(EXT.lon0);lo<=EXT.lon1;lo++)for(let la=Math.ceil(EXT.lat0);la<=EXT.lat1;la++){ctx.fillRect(px(lo)-.5,py(la)-.5,1,1)}
+  ctx.font='400 10px '+getComputedStyle(document.body).getPropertyValue('--font-m');ctx.fillStyle='rgba(147,161,184,.7)';ctx.textAlign='center';
+  for(let lo=34;lo<=48;lo+=2)ctx.fillText(lo+'°E',px(lo),MH-6);ctx.textAlign='left';for(let la=4;la<=14;la+=2)ctx.fillText(la+'°N',6,py(la)+3);
+  const outline=()=>{ctx.beginPath();OUT.forEach((p,i)=>i?ctx.lineTo(px(p[0]),py(p[1])):ctx.moveTo(px(p[0]),py(p[1])));ctx.closePath()};
+  outline();ctx.fillStyle='rgba(37,51,82,.28)';ctx.fill();
+  if(S.cells.length&&S.hasGeo&&S.cz.length){
+    const wc=S.cs/(EXT.lon1-EXT.lon0)*MW,hc=S.cs/(EXT.lat1-EXT.lat0)*MH;
+    S.cells.forEach((c,ci)=>{const k=cls(cellZ(ci,S.cur));ctx.fillStyle=CCOL[k];ctx.globalAlpha=k==='x'?.35:.93;ctx.fillRect(px(c.lon)-wc/2+.5,py(c.lat)-hc/2+.5,wc-1,hc-1)});ctx.globalAlpha=1;
+    if(S.A&&!S.A.nogeo){ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=1;S.A.ids.forEach(id=>{const c=S.cells[id];ctx.strokeRect(px(c.lon)-wc/2+.5,py(c.lat)-hc/2+.5,wc-1,hc-1)})}
+  }
+  outline();ctx.strokeStyle='rgba(40,215,197,.7)';ctx.lineWidth=1.4;ctx.shadowColor='rgba(40,215,197,.5)';ctx.shadowBlur=10;ctx.stroke();ctx.shadowBlur=0;
+  const drawSel=(lat,lon,r,col,lbl)=>{const rx=r/(111*Math.cos(lat*Math.PI/180))/(EXT.lon1-EXT.lon0)*MW,ry=r/111/(EXT.lat1-EXT.lat0)*MH;ctx.beginPath();ctx.ellipse(px(lon),py(lat),rx,ry,0,0,Math.PI*2);ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.setLineDash(lbl?[2,4]:[]);ctx.stroke();ctx.setLineDash([]);
+    ctx.beginPath();ctx.moveTo(px(lon)-6,py(lat));ctx.lineTo(px(lon)+6,py(lat));ctx.moveTo(px(lon),py(lat)-6);ctx.lineTo(px(lon),py(lat)+6);ctx.stroke();if(lbl){ctx.fillStyle=col;ctx.font='500 11px '+getComputedStyle(document.body).getPropertyValue('--font-m');ctx.textAlign='left';ctx.fillText(lbl,px(lon)+8,py(lat)-8)}};
+  S.pins.forEach((p,i)=>drawSel(p.lat,p.lon,p.r,PINCOL[i],String.fromCharCode(65+i)));
+  drawSel(S.sel.lat,S.sel.lon,S.sel.r,'#28D7C5','');
+}
+function renderLegend(){
+  const items=[['-1','Above'],['0','Normal'],['1','Watch'],['2','Moderate'],['3','Severe'],['4','Extreme']];
+  const lim=['≥ '+fz(-S.th[0]),'','≤ '+fz(S.th[0]),'≤ '+fz(S.th[1]),'≤ '+fz(S.th[2]),'≤ '+fz(S.th[3])];
+  $('#legend').innerHTML=`<div class="lab">${S.layer==='comp'?'Composite':SIG.find(s=>s.k===S.layer).short} anomaly (σ)</div><div class="bar">${items.map(i=>`<span style="background:${CCOL[i[0]]}"></span>`).join('')}</div><div class="tx">${items.map((i,k)=>`<span>${i[1]}<br>${lim[k]}</span>`).join('')}</div>`;
+}
+function renderFindings(){
+  const el=$('#findings');
+  if(!S.A){el.innerHTML='<div class="empty"><b>No data loaded</b>Load a CSV/JSON file or start the synthetic demo to begin an investigation.</div>';return}
+  const A=S.A,F=S.F,c=cls(F.comp),col=CCOL[c];
+  const synth=S.src.kind==='synthetic';
+  const sel=S.hasGeo?`${fv(S.sel.lat,2)}°N ${fv(S.sel.lon,2)}°E · ${S.sel.r} km · ${A.ids.length} cell${A.ids.length===1?'':'s'}`:'Regional series (no coordinates)';
+  const trend=F.trend?(()=>{const t=F.trend,sig=t.p<0.05;const dir=t.sen<-0.05?'Declining':t.sen>0.05?'Improving':'Flat';return{dir,txt:`${t.sen>0?'+':''}${t.sen.toFixed(2).replace('-','−')} σ/yr`,sub:`n=${t.n}, p=${t.p<0.001?'<0.001':t.p.toFixed(3)} ${sig?'(significant at 0.05)':'(not significant)'}`}})():{dir:'Not enough data',txt:'—',sub:'Needs at least 12 valid months in the window'};
+  el.innerHTML=`
+    <h2>FINDINGS <small>${mlabel(S.cur)}</small></h2>
+    <div class="lab" style="margin:-4px 0 12px;text-transform:none;letter-spacing:.04em;font-size:11px">${esc(sel)}${synth?' · <span style="color:var(--c-mod)">SYNTHETIC</span>':''}</div>
+    <div class="verdict"><div class="pill" style="color:${c==='x'?'var(--dim)':col};border-color:${c==='x'?'var(--line2)':col};background:${c==='x'?'transparent':col+'22'}">${clsName(c).toUpperCase()}</div>
+      <div class="bigz" style="color:${c==='x'||c===0||c===-1?'var(--fg)':col}">${fz(F.comp)} σ<small>composite anomaly</small></div></div>
+    <table class="t"><thead><tr><th>Signal</th><th>Value</th><th>Normal</th><th>σ</th></tr></thead><tbody>
+    ${F.per.map(p=>p.on?`<tr><td><i class="dot" style="background:${p.s.color};display:inline-block;margin-right:8px"></i>${p.s.short}</td><td>${fv(p.x,p.s.dec)}</td><td>${fv(p.mu,p.s.dec)}</td><td style="color:${CCOL[cls(p.z)]==='#1C5F5C'?'var(--fg)':CCOL[cls(p.z)]}">${fz(p.z)}</td></tr>`:'').join('')}
+    </tbody></table>
+    <div class="kv">
+      <div><span class="lab">Persistence</span><b>${F.run} mo</b><small>at or below ${fz(S.th[0])} σ${F.run2?`; ${F.run2} mo at or below ${fz(S.th[1])} σ`:''}</small></div>
+      <div><span class="lab">Agreement</span><b>${F.agree} of ${F.nz}</b><small>signals at or below the Watch limit</small></div>
+      <div style="grid-column:1/-1"><span class="lab">Trend · last ${S.win} months</span><b>${trend.dir} · ${trend.txt}</b><small>${trend.sub}. Mann-Kendall test with Sen slope on the composite.</small></div>
+    </div>`;
+}
+function renderEvidence(){
+  const ul=$('#evidence');if(!S.A){ul.innerHTML='<li class="wn"><b>!</b><span>Load data to see the checks.</span></li>';return}
+  const F=S.F,A=S.A,items=[];
+  const add=(t,h,b)=>items.push(`<li class="${t}"><b>${t==='ok'?'✓':t==='wn'?'!':'✕'}</b><span><strong>${h}</strong> ${b}</span></li>`);
+  if(S.src.kind==='synthetic')add('no','Synthetic data.','Generated for testing the interface. Nothing here describes real conditions.');
+  else add('wn','User-supplied file.',`${esc(S.src.name)}: its source, units and processing are not verified by the Lab.`);
+  F.baseYears>=10?add('ok','Baseline length.',`${F.baseYears} years (${S.base.y0}–${S.base.y1}).`):add('wn','Short baseline.',`${F.baseYears} year${F.baseYears===1?'':'s'}; normals are unstable below about 10 years. WMO climate normals use 30.`);
+  const cc=A.ids.length;
+  if(A.outside)add('no','No data in the circle.','Move the centre or widen the radius.');
+  else if(A.nogeo)add('wn','No coordinates.','The whole file is treated as one regional series.');
+  else if(A.nearest)add('wn','Nearest cell used.',`No cell centre inside the radius; using the nearest one, ${A.dist.toFixed(0)} km away.`);
+  else cc>=3?add('ok','Spatial support.',`${cc} cells are averaged.`):add('wn','Thin spatial support.',`${cc} cell${cc===1?'':'s'} in the circle. A wider radius gives a steadier signal.`);
+  const low=F.cov.filter(c=>c.f<0.9);
+  F.cov.length&&!low.length?add('ok','Coverage.',`Every selected signal has at least 90% valid months in the last ${S.win}.`):low.length&&add('wn','Gaps in the window.',low.map(c=>`${c.s.short} ${Math.round(c.f*100)}%`).join(', ')+' valid months.');
+  F.nz>=2?(F.agree>=2?add('ok','Signals agree.',`${F.agree} of ${F.nz} are at or below Watch.`):add('wn','Signals disagree.',`Only ${F.agree} of ${F.nz} are at or below Watch.`)):add('wn','Single signal.','Agreement cannot be assessed.');
+  if(F.comp===F.comp&&F.comp<=S.th[0])F.run>=3?add('ok','Persistent.',`${F.run} consecutive months below the Watch limit.`):add('wn','Short-lived.',`${F.run} month${F.run===1?'':'s'} below the Watch limit; short dry spells are common.`);
+  ul.innerHTML=items.join('');
+}
+function renderLead(){
+  const el=$('#leadlag');if(!S.A){el.innerHTML='';return}
+  const pairs=[['p','s'],['p','n'],['s','n']].filter(([a,b])=>S.src.has[a]&&S.src.has[b]);
+  if(!pairs.length){el.innerHTML='<p class="hint">Needs at least two signals.</p>';return}
+  el.innerHTML=pairs.map(([a,b])=>{
+    const sa=SIG.find(s=>s.k===a),sb=SIG.find(s=>s.k===b);const r=[];for(let l=0;l<=6;l++)r.push(pearson(S.A.z[a],S.A.z[b],l));
+    const ok=r.filter(x=>x.r===x.r);if(!ok.length)return`<div class="ll"><span>${sa.short} → ${sb.short}</span><span class="hint">Too few paired months.</span></div>`;
+    let bi=0;r.forEach((x,i)=>{if(x.r===x.r&&(r[bi].r!==r[bi].r||Math.abs(x.r)>Math.abs(r[bi].r)))bi=i});
+    return`<div class="ll"><span>${sa.short} → ${sb.short}<br><span class="mono" style="color:var(--acc);font-size:11px">best ${bi} mo · r=${r[bi].r.toFixed(2).replace('-','−')}</span></span><div class="bars">${r.map((x,i)=>`<div title="lag ${i} mo: r=${fv(x.r,2)}"><i class="${i===bi?'best':''}" style="height:${x.r===x.r?Math.max(2,Math.abs(x.r)*34):2}px;${x.r<0?'background:var(--c-ext)':''}"></i><em>${i}</em></div>`).join('')}</div></div>`}).join('')+
+    '<p class="hint" style="margin:8px 0 0">Correlation of anomalies when the first signal leads by k months, over the full record. Indicative only: neighbouring months are not independent.</p>';
+}
+function renderSeries(){
+  const el=$('#series'),lg=$('#serLegend');if(!S.A){el.innerHTML='<div class="empty"><b>No data loaded</b>The anomaly series appears here.</div>';lg.innerHTML='';return}
+  const A=S.A,ss=incl().filter(s=>S.src.has[s.k]);
+  if(S.mode==='z'){
+    lg.innerHTML=`<span><i style="background:var(--fg)"></i>Composite</span>`+ss.map(s=>`<span><i style="background:${s.color}"></i>${s.short}</span>`).join('')+`<span style="color:var(--dim)">dashed = class limits</span>`;
+    zChart(el,[{arr:A.comp,color:'#E7EDF5',w:2.2,o:1}].concat(ss.map(s=>({arr:A.z[s.k],color:s.color,w:1.2,o:.75}))),270,'Anomaly time series in standard deviations',true);
+  }else{
+    lg.innerHTML=`<span><i style="background:var(--lblue)"></i>Observed</span><span><i style="background:var(--navy);height:8px"></i>Baseline mean ± 1σ for that calendar month</span>`;
+    const W=Math.max(280,Math.floor(el.clientWidth||600)),padL=52,padR=10,pH=100,gap=22,padB=24,H=ss.length*(pH+gap)+padB;const[v0,v1]=view(),n=Math.max(1,v1-v0);const X=i=>padL+(i-v0)/n*(W-padL-padR);
+    let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Raw values against baseline">`;
+    ss.forEach((sg,k)=>{
+      const top=k*(pH+gap)+6,cl=A.clim[sg.k];let lo=1e9,hi=-1e9;
+      for(let i=v0;i<=v1;i++){const c=calm(i),m=cl.mu[c],d=cl.sd[c],v=A.raw[sg.k][i];if(v===v){lo=Math.min(lo,v);hi=Math.max(hi,v)}if(m===m&&d===d){lo=Math.min(lo,m-d);hi=Math.max(hi,m+d)}}
+      if(lo>=hi){lo=0;hi=1}const pd=(hi-lo)*.08;lo-=pd;hi+=pd;const Y=v=>top+(hi-v)/(hi-lo)*(pH-12);
+      let up='',dn='';for(let i=v0;i<=v1;i++){const c=calm(i),m=cl.mu[c],d=cl.sd[c];if(m===m&&d===d){up+=(up?'L':'M')+X(i).toFixed(1)+' '+Y(m+d).toFixed(1);dn='L'+X(i).toFixed(1)+' '+Y(m-d).toFixed(1)+dn}}
+      if(up)s+=`<path d="${up}${dn}Z" style="fill:var(--navy);opacity:.6"/>`;
+      let mp='';for(let i=v0;i<=v1;i++){const m=cl.mu[calm(i)];if(m===m)mp+=(mp?'L':'M')+X(i).toFixed(1)+' '+Y(m).toFixed(1)}if(mp)s+=`<path d="${mp}" fill="none" style="stroke:var(--blue);stroke-width:1"/>`;
+      const d=pathOf(A.raw[sg.k],X,Y,v0,v1);if(d)s+=`<path d="${d}" fill="none" style="stroke:${sg.color};stroke-width:1.6" stroke-linejoin="round"/>`;
+      s+=`<text x="${padL-8}" y="${Y(hi-pd)+4}" text-anchor="end" style="fill:var(--dim);font:400 10px var(--font-m)">${fv(hi-pd,sg.dec)}</text><text x="${padL-8}" y="${Y(lo+pd)+4}" text-anchor="end" style="fill:var(--dim);font:400 10px var(--font-m)">${fv(lo+pd,sg.dec)}</text><text x="${padL}" y="${top-1}" style="fill:${sg.color};font:500 10px var(--font-m);letter-spacing:.08em">${sg.short.toUpperCase()}${sg.unit?' · '+sg.unit:''}</text>`;
+      s+=`<line x1="${padL}" x2="${W-padR}" y1="${top+pH-12}" y2="${top+pH-12}" style="stroke:var(--line)"/>`;
+    });
+    s+=xTicks(X,v0,v1,W,H,padB);
+    if(S.cur>=v0&&S.cur<=v1){const x=X(S.cur);s+=`<line x1="${x}" x2="${x}" y1="0" y2="${H-padB}" style="stroke:var(--fg);opacity:.55"/>`}
+    s+='</svg>';el.innerHTML=s;el._geo={padL,padR,W,v0,v1};
+  }
+}
+function renderFP(){
+  const el=$('#fp');if(!S.A){el.innerHTML='<div class="empty"><b>No data loaded</b></div>';return}
+  const A=S.A,rows=incl().filter(s=>S.src.has[s.k]).map(s=>({l:s.short,arr:A.z[s.k]})).concat([{l:'ALL',arr:A.comp}]);
+  const W=Math.max(280,Math.floor(el.clientWidth||600)),padL=52,padR=6,rh=22,gap=4,H=rows.length*(rh+gap)+22;const[v0,v1]=view(),n=v1-v0+1,cw=(W-padL-padR)/n;
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Drought class by month and signal">`;
+  rows.forEach((r,k)=>{const y=k*(rh+gap);s+=`<text x="${padL-8}" y="${y+15}" text-anchor="end" style="fill:${k===rows.length-1?'var(--fg)':'var(--mut)'};font:500 10px var(--font-m);letter-spacing:.08em">${r.l.toUpperCase()}</text>`;
+    for(let i=v0;i<=v1;i++){const c=cls(r.arr[i]);s+=`<rect x="${(padL+(i-v0)*cw).toFixed(2)}" y="${y}" width="${Math.max(.8,cw-(cw>3?1:0)).toFixed(2)}" height="${rh}" style="fill:${CCOL[c]};opacity:${c==='x'?.4:.95}"/>`}});
+  const X=i=>padL+(i-v0)/Math.max(1,v1-v0)*(W-padL-padR);
+  s+=xTicks(X,v0,v1,W,H,22);
+  if(S.cur>=v0){const x=padL+(S.cur-v0)*cw;s+=`<rect x="${x-1}" y="-1" width="${Math.max(3,cw)+2}" height="${rows.length*(rh+gap)}" fill="none" style="stroke:var(--fg);stroke-width:1.5"/>`}
+  s+='</svg>';el.innerHTML=s;el._geo={padL,padR,W,v0,v1,cw,fp:true};
+  fpRead(S.cur);
+}
+function fpRead(i){
+  if(!S.A)return;const A=S.A;const ss=incl().filter(s=>S.src.has[s.k]);
+  $('#fpRead').textContent=mlabel(i)+' · '+ss.map(s=>s.short+' '+fz(A.z[s.k][i])).join(' · ')+' · All '+fz(A.comp[i])+' → '+clsName(cls(A.comp[i]));
+}
+function renderCompare(){
+  const el=$('#cmp'),lg=$('#cmpLegend'),pe=$('#pins');
+  if(!S.A){el.innerHTML='<div class="empty"><b>No data loaded</b></div>';lg.innerHTML='';pe.innerHTML='';return}
+  const lines=[{arr:S.A.comp,color:'#28D7C5',w:2.2,o:1}],legs=[['#28D7C5','Current selection']];
+  S.pinA.forEach((a,i)=>{lines.push({arr:a.comp,color:PINCOL[i],w:1.6,o:.95});legs.push([PINCOL[i],'Pin '+String.fromCharCode(65+i)])});
+  if(S.ref&&S.hasGeo){lines.push({arr:S.ref.comp,color:'#93A1B8',w:1.3,o:.8,dash:'4 3'});legs.push(['#93A1B8','All data cells'])}
+  lg.innerHTML=legs.map(l=>`<span><i style="background:${l[0]}"></i>${l[1]}</span>`).join('');
+  zChart(el,lines,200,'Composite anomaly for pinned locations',false);
+  const rows=[['Selection',S.A,'#28D7C5',null]].concat(S.pinA.map((a,i)=>['Pin '+String.fromCharCode(65+i),a,PINCOL[i],i]));
+  pe.innerHTML=rows.map(([nm,a,c,i])=>{const z=a.comp[S.cur],k=cls(z);const sp=i===null?(S.hasGeo?`${fv(S.sel.lat,1)}°N ${fv(S.sel.lon,1)}°E`:'region'):`${fv(S.pins[i].lat,1)}°N ${fv(S.pins[i].lon,1)}°E · ${S.pins[i].r} km`;
+    return`<div class="pinrow"><i class="dot" style="background:${c}"></i><span>${nm}<br><code>${sp}</code></span><span class="mono" style="color:${k==='x'||k===0||k===-1?'var(--fg)':CCOL[k]}">${fz(z)} σ · ${clsName(k)}</span>${i===null?'<span></span>':`<button class="x" type="button" data-rm="${i}" aria-label="Remove pin ${nm}">×</button>`}</div>`}).join('')+(S.pins.length?'':'<p class="hint" style="margin:8px 0 0">Pin up to three places to compare their composite anomaly over time.</p>');
+}
+function summaryText(){
+  if(!S.A)return'';const F=S.F,A=S.A,c=cls(F.comp);const t=F.trend;
+  const L=[];
+  L.push('DROUGHT INVESTIGATION LAB · summary');
+  L.push('Data: '+(S.src.kind==='synthetic'?'SYNTHETIC DEMO DATA (not observations)':'file "'+S.src.name+'" (unverified)'));
+  L.push('Location: '+(S.hasGeo?`${fv(S.sel.lat,2)}°N ${fv(S.sel.lon,2)}°E, radius ${S.sel.r} km, ${A.ids.length} cell(s)`:'regional series'));
+  L.push(`Month: ${mlabel(S.cur)} | Baseline: ${S.base.y0}-${S.base.y1} (${F.baseYears} yr), monthly climatology`);
+  L.push(`Class limits (σ): Watch ${fz(S.th[0])}, Moderate ${fz(S.th[1])}, Severe ${fz(S.th[2])}, Extreme ${fz(S.th[3])}`);
+  L.push('');
+  L.push(`Composite anomaly: ${fz(F.comp)} σ → ${clsName(c)}`);
+  F.per.filter(p=>p.on).forEach(p=>L.push(`  ${p.s.label}: ${fv(p.x,p.s.dec)} ${p.s.unit} (normal ${fv(p.mu,p.s.dec)}), ${fz(p.z)} σ`));
+  L.push(`Agreement: ${F.agree} of ${F.nz} signals at or below Watch`);
+  L.push(`Persistence: ${F.run} consecutive month(s) at or below Watch; ${F.run2} at or below Moderate`);
+  L.push(t?`Trend (${S.win} mo): Sen slope ${t.sen>0?'+':''}${t.sen.toFixed(2)} σ/yr, Mann-Kendall p=${t.p.toFixed(3)}`:`Trend (${S.win} mo): not enough valid months`);
+  L.push('');
+  L.push('Caveats: anomalies are relative to the chosen baseline; the composite is an unweighted mean of selected signals; class limits are Lab settings, not an official drought index; trend p-values ignore autocorrelation.');
+  return L.join('\n');
+}
+function renderMethods(){
+  $('#methods').innerHTML=`
+  <h3>Anomaly</h3><p>Observations are averaged inside the selected circle, then to calendar months. For each calendar month the baseline mean and standard deviation are computed over the baseline years. Anomaly (σ) = (value − baseline mean) ÷ baseline standard deviation. A month needs at least 5 baseline values.</p>
+  <h3>Composite and classes</h3><p>The composite is the unweighted mean of the selected signals' anomalies. Classes use the limits in section 4. They are adjustable Lab settings and are not an official drought index such as SPI or USDM categories.</p>
+  <h3>Persistence and agreement</h3><p>Persistence counts consecutive months ending at the selected month with the composite at or below a limit. Agreement counts selected signals at or below the Watch limit in that month.</p>
+  <h3>Trend</h3><p>Mann-Kendall test with the Sen slope over the trend window, on the composite. P-values assume independent months, so they are optimistic for autocorrelated series.</p>
+  <h3>Lead and lag</h3><p>Pearson correlation of anomaly series with the first signal shifted by 0 to 6 months. It suggests the order in which signals respond; it does not prove cause.</p>
+  <h3>Limits</h3><ul><li>Short baselines make normals unstable. Aim for 10 years or more.</li><li>Averaging cells inside a circle blurs local variation, and cell size limits spatial detail.</li><li>Precipitation is averaged, not summed, within a month, which does not change its anomaly when coverage is steady.</li><li>The national outline on the map is schematic and for orientation only.</li><li>Synthetic demo data is generated for testing the interface and carries no information about real conditions.</li></ul>
+  <h3>Porting to the main app</h3><p>Call <span class="mono">ingest(rows, meta)</span> with the pipeline's output, where each row is {t, lat, lon, p, s, n}. Everything else reads from that.</p>`;
+}
+function renderChips(){
+  const c=$('#chips');if(!S.src){c.innerHTML='<span class="chip warn"><i></i>No data</span>';return}
+  const a=S.src.kind==='synthetic'?'<span class="chip warn"><i></i>Synthetic demo data</span>':`<span class="chip"><i></i>${esc(S.src.name)}</span>`;
+  c.innerHTML=a+`<span class="chip">${mlabel(0)} → ${mlabel(S.nM-1)}</span><span class="chip">${S.cells.length} cell${S.cells.length===1?'':'s'}</span>`;
+  const b=$('#banner');if(S.src.kind==='synthetic'){b.hidden=false;b.innerHTML='<b>Synthetic data</b><span>The numbers on this page were generated to test the interface. They are not observations and say nothing about real drought conditions. Load a file to investigate real data.</span>'}else b.hidden=true;
+  $('#dsStatus').innerHTML=S.src.kind==='synthetic'?'Using generated demo data.':`Loaded <b>${esc(S.src.name)}</b>: ${S.cells.length} cell(s), ${S.nM} months. Signals found: ${SIG.filter(s=>S.src.has[s.k]).map(s=>s.short).join(', ')}.`;
+}
+
+/* ============================== PIPELINE ============================== */
+function recompute(){
+  if(!S.src){S.A=null;S.F=null;S.pinA=[];S.ref=null;renderAll();return}
+  computeCellZ();
+  S.A=analyze(S.sel);S.pinA=S.pins.map(p=>analyze(p));S.ref=S.hasGeo?analyze({all:true}):null;
+  renderAll();
+}
+function renderAll(){
+  renderChips();renderLegend();
+  if(S.A)S.F=findings(S.A);
+  $('#mapMonth').textContent=S.src?mlabel(S.cur):'—';
+  $('#mapLayerName').textContent=S.layer==='comp'?'Composite anomaly':SIG.find(s=>s.k===S.layer).label+' anomaly';
+  $('#scrub').max=Math.max(0,S.nM-1);$('#scrub').value=S.cur;
+  drawMap();renderFindings();renderEvidence();renderLead();renderSeries();renderFP();renderCompare();
+  const sm=summaryText();$('#summary').value=sm||'Load data to build a summary.';
+}
+function renderTime(){ // cheap path when only the month changes
+  if(S.A)S.F=findings(S.A);
+  $('#mapMonth').textContent=mlabel(S.cur);$('#scrub').value=S.cur;
+  drawMap();renderFindings();renderEvidence();renderSeries();renderFP();renderCompare();
+  $('#summary').value=summaryText();
+}
+function afterLoad(){
+  $('#bY0').value=S.base.y0;$('#bY1').value=S.base.y1;
+  ['p','s','n'].forEach(k=>{const e=$('#sig'+k.toUpperCase());e.checked=S.signals[k];e.disabled=!S.src.has[k]});
+  recompute();
+}
+function setSel(lat,lon,r){
+  if(lat!==undefined)S.sel.lat=clamp(+lat,EXT.lat0,EXT.lat1);if(lon!==undefined)S.sel.lon=clamp(+lon,EXT.lon0,EXT.lon1);if(r!==undefined)S.sel.r=+r;
+  $('#lat').value=S.sel.lat.toFixed(2);$('#lon').value=S.sel.lon.toFixed(2);$('#rad').value=S.sel.r;$('#radV').textContent=S.sel.r;
+}
+
+/* ============================== EVENTS ============================== */
+function bind(){
+  const pre=$('#preset');pre.innerHTML='<option value="">Custom</option>'+PRESETS.map((p,i)=>`<option value="${i}">${esc(p.n)}</option>`).join('');
+  pre.onchange=()=>{if(pre.value==='')return;const p=PRESETS[+pre.value];setSel(p.lat,p.lon,p.r);recompute()};
+  const ll=()=>{pre.value='';setSel($('#lat').value,$('#lon').value);recompute()};
+  $('#lat').onchange=ll;$('#lon').onchange=ll;
+  $('#rad').oninput=()=>{$('#radV').textContent=$('#rad').value};$('#rad').onchange=()=>{pre.value='';setSel(undefined,undefined,$('#rad').value);recompute()};
+  ['P','S','N'].forEach(k=>$('#sig'+k).onchange=e=>{S.signals[k.toLowerCase()]=e.target.checked;recompute()});
+  $('#layer').onchange=e=>{S.layer=e.target.value;renderLegend();$('#mapLayerName').textContent=e.target.selectedOptions[0].text;drawMap()};
+  const bs=()=>{let a=Math.round(+$('#bY0').value),b=Math.round(+$('#bY1').value);if(!S.src)return;const fy=Math.floor(S.m0/12),ly=Math.floor((S.m0+S.nM-1)/12);a=clamp(a||fy,fy,ly);b=clamp(b||ly,a,ly);S.base={y0:a,y1:b};$('#bY0').value=a;$('#bY1').value=b;recompute()};
+  $('#bY0').onchange=bs;$('#bY1').onchange=bs;
+  const thSet=()=>{let t=[0,1,2,3].map(i=>+$('#th'+i).value);for(let i=0;i<4;i++)if(!(t[i]<0))t[i]=TH_DEF[i];for(let i=1;i<4;i++)if(t[i]>t[i-1])t[i]=t[i-1];S.th=t;t.forEach((v,i)=>$('#th'+i).value=v);recompute()};
+  [0,1,2,3].forEach(i=>{$('#th'+i).value=S.th[i];$('#th'+i).onchange=thSet});
+  $('#btnTh').onclick=()=>{S.th=TH_DEF.slice();[0,1,2,3].forEach(i=>$('#th'+i).value=S.th[i]);recompute()};
+  $('#win').onchange=e=>{S.win=+e.target.value;renderTime()};
+  $('#range').onchange=e=>{S.range=+e.target.value;renderTime()};
+  $('#btnSynth').onclick=()=>{loadSynthetic()};
+  $('#btnClear').onclick=()=>{stop();S.src=null;S.cells=[];S.cz=[];S.nM=0;S.A=null;S.pins=[];$('#loadErr').textContent='';$('#dsStatus').textContent='No data loaded.';recompute()};
+  const fin=$('#fileIn'),dr=$('#drop');
+  const readF=f=>{if(!f)return;const r=new FileReader();r.onload=()=>loadText(f.name,String(r.result));r.onerror=()=>{$('#loadErr').textContent='Could not read that file.'};r.readAsText(f)};
+  fin.onchange=()=>readF(fin.files[0]);
+  ['dragenter','dragover'].forEach(ev=>dr.addEventListener(ev,e=>{e.preventDefault();dr.classList.add('over')}));
+  ['dragleave','drop'].forEach(ev=>dr.addEventListener(ev,e=>{e.preventDefault();dr.classList.remove('over')}));
+  dr.addEventListener('drop',e=>readF(e.dataTransfer.files[0]));
+  $('#btnPin').onclick=()=>{if(!S.A)return;if(S.pins.length>=3)S.pins.shift();S.pins.push({lat:S.sel.lat,lon:S.sel.lon,r:S.sel.r});recompute()};
+  $('#pins').onclick=e=>{const b=e.target.closest('[data-rm]');if(b){S.pins.splice(+b.dataset.rm,1);recompute()}};
+  // map
+  const tip=$('#tip');
+  const geo=e=>{const r=cv.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;return{x,y,lon:EXT.lon0+x/MW*(EXT.lon1-EXT.lon0),lat:EXT.lat1-y/MH*(EXT.lat1-EXT.lat0)}};
+  cv.addEventListener('click',e=>{if(!S.src||!S.hasGeo)return;const g=geo(e);$('#preset').value='';setSel(g.lat,g.lon);recompute()});
+  cv.addEventListener('pointermove',e=>{
+    if(!S.src||!S.hasGeo){tip.hidden=true;return}
+    const g=geo(e);let best=-1,bd=1e9;S.cells.forEach((c,i)=>{const d=Math.abs(c.lon-g.lon)+Math.abs(c.lat-g.lat);if(d<bd){bd=d;best=i}});
+    if(best<0||bd>S.cs*1.2){tip.hidden=true;return}
+    const c=S.cells[best],z=cellZ(best,S.cur);
+    tip.innerHTML=`${fv(c.lat,2)}°N ${fv(c.lon,2)}°E<br>${S.layer==='comp'?'Composite':SIG.find(s=>s.k===S.layer).short} ${fz(z)} σ · ${clsName(cls(z))}`;tip.hidden=false;
+    const w=tip.offsetWidth;tip.style.left=Math.min(MW-w-8,g.x+14)+'px';tip.style.top=Math.max(6,g.y-48)+'px'});
+  cv.addEventListener('pointerleave',()=>tip.hidden=true);
+  // scrubber + play
+  $('#scrub').oninput=e=>{stop();S.cur=+e.target.value;renderTime()};
+  $('#btnPlay').onclick=()=>{S.playing?stop():play()};
+  // chart pointer
+  ['#series','#cmp','#fp'].forEach(id=>{
+    const el=$(id);let down=false;
+    const pick=e=>{if(!el._geo||!S.src)return null;const g=el._geo,r=el.getBoundingClientRect();const x=e.clientX-r.left;const i=Math.round(g.v0+(x-g.padL)/(g.W-g.padL-g.padR)*(g.v1-g.v0));return clamp(g.fp?Math.floor(g.v0+(x-g.padL)/g.cw):i,g.v0,g.v1)};
+    el.addEventListener('pointerdown',e=>{down=true;stop();try{el.setPointerCapture(e.pointerId)}catch(_){}const i=pick(e);if(i!==null&&i!==S.cur){S.cur=i;renderTime()}});
+    el.addEventListener('pointermove',e=>{const i=pick(e);if(i===null)return;if(down&&i!==S.cur){S.cur=i;renderTime()}else if(id==='#fp')fpRead(i)});
+    el.addEventListener('pointerup',()=>{down=false});el.addEventListener('pointerleave',()=>{if(id==='#fp')fpRead(S.cur)});
+  });
+  $('#tabZ').onclick=()=>{S.mode='z';$('#tabZ').setAttribute('aria-selected','true');$('#tabR').setAttribute('aria-selected','false');renderSeries()};
+  $('#tabR').onclick=()=>{S.mode='r';$('#tabR').setAttribute('aria-selected','true');$('#tabZ').setAttribute('aria-selected','false');renderSeries()};
+  // copy
+  const copy=(txt)=>{const m=$('#copyMsg');const fb=()=>{const t=$('#summary');t.value=txt;t.focus();t.select();m.textContent='Press Ctrl/Cmd+C to copy'};
+    try{navigator.clipboard.writeText(txt).then(()=>{m.textContent='Copied';setTimeout(()=>m.textContent='',1800)},fb)}catch(_){fb()}};
+  $('#btnCopy').onclick=()=>copy(summaryText());
+  $('#btnCopyJ').onclick=()=>copy(JSON.stringify({location:S.sel,baseline:S.base,limits:S.th,signals:S.signals,month:S.src?mlabel(S.cur):null,window:S.win},null,2));
+  let rt;new ResizeObserver(()=>{clearTimeout(rt);rt=setTimeout(()=>{sizeMap();drawMap();renderSeries();renderFP();renderCompare()},60)}).observe(document.body);
+}
+function play(){if(!S.src)return;S.playing=true;$('#btnPlay').textContent='Pause';if(S.cur>=S.nM-1)S.cur=Math.max(0,S.nM-Math.min(S.nM,S.range||S.nM));S.timer=setInterval(()=>{if(S.cur>=S.nM-1){stop();return}S.cur++;renderTime()},380)}
+function stop(){S.playing=false;$('#btnPlay').textContent='Play';clearInterval(S.timer)}
+
+/* ============================== INIT ============================== */
+renderMethods();bind();sizeMap();setSel(S.sel.lat,S.sel.lon,S.sel.r);loadSynthetic();
+window.EthioLab={ingest:(rows,meta)=>{ingest(rows,meta||{kind:'app',name:'ETHIODROUGHT pipeline'});afterLoad()}};
+})();
+</script>

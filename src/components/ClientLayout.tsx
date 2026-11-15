@@ -1,21 +1,29 @@
 "use client";
 
 import React from "react";
+import { usePathname } from "next/navigation";
 import { AppProvider } from "@/context/AppContext";
+import { AuthProvider } from "@/context/AuthContext";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { AuthModal } from "@/components/auth/AuthModal";
+import { ProfileModal } from "@/components/auth/ProfileModal";
 
 export const ClientLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+
   return (
     <AppProvider>
-      <div className="min-h-screen bg-[#040507] text-text-primary flex flex-col font-sans">
-        <Navbar />
-        <div role="status" className="border-b border-amber-500/30 bg-amber-950/60 px-4 py-2 text-center text-[10px] sm:text-[11px] font-mono text-amber-200">
-          NASA POWER / MERRA-2 point data and static 72-zone grid summaries are available on the Data page. The experimental Predictor is historical, national-box rainfall only; other built-in analysis series remain synthetic, and monthly zonal GPM / FLDAS / MODIS observations are not available.
+      <AuthProvider>
+        <div className="min-h-screen bg-[#040507] text-text-primary flex flex-col font-sans">
+          {!isHome && <Navbar />}
+          <main className="flex-1">{children}</main>
+          {!isHome && <Footer />}
+          <AuthModal />
+          <ProfileModal />
         </div>
-        <main className="flex-1">{children}</main>
-        <Footer />
-      </div>
+      </AuthProvider>
     </AppProvider>
   );
 };

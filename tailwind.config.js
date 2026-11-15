@@ -39,8 +39,11 @@ module.exports = {
         }
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
-        mono: ["var(--font-mono)", "Menlo", "Monaco", "Consolas", "monospace"],
+        sans: ["'Inter'", "'Plus Jakarta Sans'", "system-ui", "-apple-system", "sans-serif"],
+        heading: ["'Michroma'", "'Orbitron'", "'Space Grotesk'", "sans-serif"],
+        michroma: ["'Michroma'", "'Orbitron'", "sans-serif"],
+        orbitron: ["'Orbitron'", "'Michroma'", "sans-serif"],
+        mono: ["'JetBrains Mono'", "Menlo", "Monaco", "Consolas", "monospace"],
       },
       boxShadow: {
         'panel': '0 8px 32px 0 rgba(0, 0, 0, 0.5)',

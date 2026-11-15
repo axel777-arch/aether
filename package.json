@@ -11,7 +11,9 @@
     "train:rainfall": "node scripts/train_rainfall_gpr.js"
   },
   "dependencies": {
+    "@types/three": "^0.187.0",
     "clsx": "^2.1.1",
+    "framer-motion": "^14.14.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.468.0",
     "next": "^15.5.28",
@@ -19,7 +21,8 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "recharts": "^2.13.3",
-    "tailwind-merge": "^2.5.5"
+    "tailwind-merge": "^2.5.5",
+    "three": "^0.187.0"
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.14",

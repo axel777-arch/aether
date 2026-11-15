@@ -16,13 +16,15 @@ export const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-xs">
           {/* Brand Column */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-panel-dark border border-accent-secondary/40 flex items-center justify-center">
-                <div className="w-3 h-3 rounded-full border-2 border-accent-cyan flex items-center justify-center">
-                  <div className="w-1 h-1 rounded-full bg-accent-cyan" />
-                </div>
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl overflow-hidden bg-panel-dark border border-accent-cyan/40 shadow-[0_0_15px_rgba(40,215,197,0.3)] shrink-0">
+                <img
+                  src="/logo.jpg"
+                  alt="ETHIODROUGHT Logo"
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <span className="font-mono font-bold text-text-primary tracking-wider text-sm">
+              <span className="font-heading font-bold text-text-primary tracking-wider text-base">
                 {t.appName}
               </span>
             </div>
@@ -44,6 +46,8 @@ export const Footer: React.FC = () => {
               <Link href="/trends" className="text-text-subtle hover:text-accent-cyan transition-colors">Trend Detective</Link>
               <Link href="/predict" className="text-text-subtle hover:text-accent-cyan transition-colors">Experimental Predictor</Link>
               <Link href="/compare" className="text-text-subtle hover:text-accent-cyan transition-colors">Regional Comparison</Link>
+              <Link href="/alerts" className="text-text-subtle hover:text-accent-cyan transition-colors">ETHIODROUGHT Alert</Link>
+              <Link href="/datasets" className="text-text-subtle hover:text-accent-cyan transition-colors">Dataset Explorer</Link>
             </nav>
           </div>
 
